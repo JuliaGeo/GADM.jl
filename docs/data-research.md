@@ -35,6 +35,8 @@ Precisely, [Polygon](https://tools.ietf.org/html/rfc7946#section-3.1.6) & [Multi
  - https://gadm.org/download_world.html
  
    This gives data in a csv, dbf, prj format. If figured out, this has everything for each country on a country level (0), province level (1), district level (2), subdistrict level (3).
+   
+   :warning: These data were extracted from the GADM database (www.gadm.org), version 2.5, July 2015. They can be used for non-commercial purposes only.  It is not allowed to redistribute these data, or use them for commercial purposes, without prior consent.
  
 #### Resources for cities
 
