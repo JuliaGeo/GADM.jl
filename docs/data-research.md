@@ -30,6 +30,10 @@ Precisely, [Polygon](https://tools.ietf.org/html/rfc7946#section-3.1.6) & [Multi
  Initial research suggests that data is available only for major countries like US, Canada, India, etc. that too in a very scattered manner.  
  Looking for dataset which gives everything in one place.
  
+ GADM Data is the thing to look for.
+ 
+ - https://gadm.org/download_world.html
+ 
 #### Resources for cities
 
 1. https://github.com/drei01/geojson-world-cities :heavy_check_mark:
