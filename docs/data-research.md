@@ -24,3 +24,8 @@ Precisely, [Polygon](https://tools.ietf.org/html/rfc7946#section-3.1.6) & [Multi
 - [https://data.world/dgreiner/world-spatial-data](https://data.world/dgreiner/world-spatial-data)
 
   [This](https://data.world/dgreiner/world-spatial-data/file/ne_50m_admin_0_countries.geojson) is the best dataset I found but the size of 50m scale map is about 4MB. It has details which we do not need like Income groups etc. But it is very exhaustive in terms of countries, regions, names, etc.
+  
+#### Resources for state/province datasets
+
+ Initial research suggests that data is available only for major countries like US, Canada, India, etc. that too in a very scattered manner.  
+ Looking for dataset which gives everything in one place.
