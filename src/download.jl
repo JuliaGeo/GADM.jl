@@ -42,6 +42,10 @@ function download(dataset_code)
 
     dataset_url = generate_dataset_url(dataset_code)
 
+    if length(dataset_url) == 0
+        return
+    end
+
     register_datadep(dataset_code, dataset_url)
 
     println("\n🌏 Successfully downloaded the dataset!")
