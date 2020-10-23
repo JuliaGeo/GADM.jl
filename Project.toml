@@ -3,6 +3,9 @@ uuid = "a8dd9ffe-31dc-4cf5-a379-ea69100a8233"
 authors = ["Aayush Joglekar <aayushjog@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
+
 [compat]
 julia = "1"
 
