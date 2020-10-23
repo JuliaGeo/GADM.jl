@@ -47,5 +47,3 @@ function download(dataset_code)
     println("\n🌏 Successfully downloaded the dataset!")
 
 end
-
-download("GADM/IND")
