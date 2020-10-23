@@ -1,39 +1,36 @@
-using Printf
-using DataDeps
-
-# generate_dataset_url helper function
-# This function takes in a dataset code of format "GADM/<country_code>"
-# It returns the URL of the gpkg dataset of the country
-
-function generate_dataset_url(dataset_code)
+"""
+dataurl(dataset_code)
+This function takes in a dataset code of format "GADM/<country_code>"
+Returns the URL of the gpkg dataset of the country
+"""
+function dataurl(dataset_code)
 
     # Splits GADM/IND to GADM, IND
     dataset_provider, country_code = split(dataset_code, "/")
     
     # Only accepts GADM Dataset Provider
     if dataset_provider != "GADM"
-        println("❌ Dataset Provider $dataset_provider not supported.\n")
-        println("💡 Please try \"GADM/<Code>\".")
-        return ""
+        error("❌ Dataset Provider $dataset_provider not supported. 💡 Please try \"GADM/<Code>\".")
     end
     
-    println("✅ fetching $country_code's data from GADM\n")
+    @info "✅ fetching $country_code's data from GADM\n"
 
-    dataset_url = @sprintf "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_%s_gpkg.zip" country_code
+    dataset_url = "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_$(country_code)_gpkg.zip"
 
     return dataset_url 
-
 end
 
-# register_datadep helper function registers Data Dependency in DataDeps
-# It takes dataset code and dataset_url as input
-# Registers and downloads the data if not available
 
-function register_datadep(dataset_code::AbstractString, dataset_url::AbstractString)
+"""
+Download(dataset_code) 
+used to download the desired dataset
+It generates the dataset url and registers the dependency
+"""
+function Download(dataset_code)
 
-    country_code = split(dataset_code, "/")[2]
-    dataset_name = "GADM_"*country_code
-
+    dataset_url = dataurl(dataset_code)
+    provider, country = split(dataset_code, "/")
+    dataset_name = string(provider, "_", country)
 
     # This uses register function of DataDeps
     # It sets the dataset's name as $dataset_name
@@ -49,24 +46,6 @@ function register_datadep(dataset_code::AbstractString, dataset_url::AbstractStr
 
     # Calling the readdir with @datadep_str invokes the fetch starts
     # downloading the dataset if not available
-    println("Downloaded the files: ", readdir(@datadep_str dataset_name; join=true))
-
-end
-
-
-# Download function is the main function used to download the desired dataset
-# It generates the dataset url and registers the dependency
-
-function Download(dataset_code)
-
-    dataset_url = generate_dataset_url(dataset_code)
-
-    if length(dataset_url) == 0
-        return
-    end
-
-    register_datadep(dataset_code, dataset_url)
-
-    println("\n🌏 Successfully downloaded the dataset!")
+    @info "🌏 Successfully downloaded the files: ", readdir(@datadep_str dataset_name; join=true)
 
 end
