@@ -45,4 +45,5 @@ function download(dataset_code)
 
     # downloading the dataset if not available
     @info "Successfully downloaded the files: ", readdir(@datadep_str dataset_name; join=true)
+    return
 end
