@@ -1,8 +1,10 @@
 """
-dataurl(dataset_code)
+    dataurl(dataset_code)
+
 This function takes in a dataset code of format "GADM/<country_code>"
 Returns the URL of the gpkg dataset of the country
-"""
+"""    
+
 function dataurl(dataset_code)
 
     # Splits GADM/IND to GADM, IND
@@ -10,22 +12,22 @@ function dataurl(dataset_code)
     
     # Only accepts GADM Dataset Provider
     if dataset_provider != "GADM"
-        error("❌ Dataset Provider $dataset_provider not supported. 💡 Please try \"GADM/<Code>\".")
+        @error "Dataset Provider $dataset_provider not supported. Please try \"GADM/<Code>\"."
     end
     
-    @info "✅ fetching $country_code's data from GADM\n"
+    @info "Fetching $country_code's data from GADM...\n"
 
-    dataset_url = "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_$(country_code)_gpkg.zip"
-
-    return dataset_url 
+    "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_$country_code_gpkg.zip"
 end
 
 
 """
-Download(dataset_code) 
+    Download(dataset_code) 
+
 used to download the desired dataset
 It generates the dataset url and registers the dependency
 """
+
 function Download(dataset_code)
 
     dataset_url = dataurl(dataset_code)
@@ -38,7 +40,7 @@ function Download(dataset_code)
     register(
         DataDep(
             dataset_name,
-            "GADM dataset for "*dataset_code,
+            "GADM dataset for $dataset_code",
             dataset_url,
             post_fetch_method=DataDeps.unpack
         )
@@ -46,6 +48,5 @@ function Download(dataset_code)
 
     # Calling the readdir with @datadep_str invokes the fetch starts
     # downloading the dataset if not available
-    @info "🌏 Successfully downloaded the files: ", readdir(@datadep_str dataset_name; join=true)
-
+    @info "Successfully downloaded the files: ", readdir(@datadep_str dataset_name; join=true)
 end

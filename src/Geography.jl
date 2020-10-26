@@ -3,6 +3,6 @@ using Logging
 
 module Geography
 
-# Write your package code here.
+include("download.jl")
 
 end
