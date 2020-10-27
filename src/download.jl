@@ -21,7 +21,6 @@ end
 Registers and downloads the desired dataset.
 """
 function download(dataset_code)
-
     dataset_url = dataurl(dataset_code)
 
     # This uses register function of DataDeps package
