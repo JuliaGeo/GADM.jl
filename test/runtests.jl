@@ -1,5 +1,6 @@
 using Geography
 using Test
+using DataDeps
 
 testfiles = [
     "download.jl"
