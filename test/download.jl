@@ -1,3 +1,6 @@
+# DataDeps always downloads the data if it doesn't exist
+ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+
 @testset "dataurl" begin
     # dataurl returns a string on proper formatted code GADM_<Code>
     @test isequal(Geography.dataurl("GADM_IND"), "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_IND_gpkg.zip")
