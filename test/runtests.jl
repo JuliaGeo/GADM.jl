@@ -7,7 +7,7 @@ testfiles = [
 ]
 
 @testset "Geography.jl" begin
-for testfile in testfiles
+  for testfile in testfiles
     include(testfile)
   end
 end
