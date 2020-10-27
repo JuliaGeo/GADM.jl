@@ -11,10 +11,12 @@ function dataurl(dataid)
             provider, country_code = split(dataid, '_')
             "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_$(country_code)_gpkg.zip"
         catch err
-            @error "Invalid dataset format, please use GADM_<country_code>."
+            @error "invalid dataset format, please use GADM_<country_code>."
+            throw(ArgumentError("invalid dataset format"))
         end
     else
-        @error "Dataset provider not supported. Please try \"GADM_<Country Code>\"."
+        @error "dataset provider not supported, please try \"GADM_<country_code>\"."
+        throw(ArgumentError("dataset provider not supported"))
     end
 end
 
@@ -25,10 +27,6 @@ Registers and downloads the desired dataset.
 """
 function download(dataset_code)
     dataset_url = dataurl(dataset_code)
-
-    if dataset_url === nothing
-        return
-    end
 
     # This uses register function of DataDeps package
     # Registers the dataset to be used
