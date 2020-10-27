@@ -32,6 +32,6 @@ function download(dataid)
     )
 
     # downloading the dataset if not available
-    @info "Successfully downloaded the files: ", readdir(@datadep_str dataid; join=true)
+    @datadep_str dataid
     return
 end
