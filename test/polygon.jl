@@ -1,6 +1,3 @@
-# DataDeps always downloads the data if it doesn't exist
-ENV["DATADEPS_ALWAYS_ACCEPT"] = true
-
 @testset "get country polygon" begin
     # invalid country code: lowercase
     @test_throws ArgumentError Geography.get("ind")    
@@ -32,12 +29,27 @@ end
     @test Geography.isgpkg("path.mp4") === false
 end
 
-@testset "getlevel" begin
+@testset "extractdataset" begin
+    resource_data_path = Geography.download("GADM_VAT")
+
+    dataset = Geography.extractdataset(resource_data_path)
+    @test typeof(dataset) === ArchGDAL.IDataset
+
+    @test_throws SystemError Geography.extractdataset("")
+end
+
+@testset "extractgeometry" begin
+    resource_data_path = Geography.download("GADM_VAT")
     
-    resource_data_path = Geography.download("GADM_USA")
-    files = readdir(resource_data_path; join=true)
-    dataset_gpkg = Geography.filter(Geography.isgpkg, files)[1]
-    dataset = ArchGDAL.read(dataset_gpkg)
+    dataset = Geography.extractdataset(resource_data_path)
+
+    geometry = Geography.extractgeometry(dataset)
+    @test typeof(geometry) === ArchGDAL.IGeometry
+end
+
+@testset "getlevel" begin
+    resource_data_path = Geography.download("GADM_VAT")
+    dataset = Geography.extractdataset(resource_data_path)
 
     # incorrect level
     @test_throws ArgumentError Geography.getlevel(dataset, 10)
@@ -45,5 +57,4 @@ end
     # correct level
     feature_layer = Geography.getlevel(dataset, 0)
     @test typeof(feature_layer) === ArchGDAL.IFeatureLayer
-
 end
