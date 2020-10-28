@@ -1,9 +1,11 @@
 using Geography
 using Test
 using DataDeps
+using ArchGDAL
 
 testfiles = [
-    "download.jl"
+    "download.jl",
+    "polygon.jl"
 ]
 
 @testset "Geography.jl" begin
