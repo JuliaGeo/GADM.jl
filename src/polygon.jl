@@ -15,8 +15,7 @@ function getlevel(dataset::ArchGDAL.AbstractDataset, reqlevel::Int)
         end
     end
 
-    @error "valid levels for the given dataset are 0...$(layers-1)"
-    return nothing
+    throw(ArgumentError("valid levels for the given dataset are 0...$(layers-1)"))
 end
 
 """
