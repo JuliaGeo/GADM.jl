@@ -4,6 +4,7 @@ authors = ["Aayush Joglekar <aayushjog@gmail.com> and contributors"]
 version = "0.1.0"
 
 [deps]
+ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
