@@ -33,5 +33,4 @@ function download(dataid)
 
     # downloading the dataset if not available
     @datadep_str dataid
-    return
 end
