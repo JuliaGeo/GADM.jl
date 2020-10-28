@@ -2,7 +2,6 @@
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true
 
 @testset "get country polygon" begin
-    
     # invalid country code: lowercase
     @test_throws ArgumentError Geography.get("ind")    
 
