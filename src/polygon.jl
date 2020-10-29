@@ -29,7 +29,7 @@ end
 
 """
     isvalidcode(code)
-Returns true for ISO3 country codes
+Returns true for ISO 3166 Alpha 3 country codes
 """
 function isvalidcode(code::String)
     # only allow ISO3 country codes like IND, USA, BRA
@@ -70,11 +70,11 @@ end
 """
     get(code)
 Returns the MULTIPOLYGON data for the requested country.\n
-Input: ISO3 Country Code
+Input: ISO 3166 Alpha 3 Country Code
 """
 function get(code)
     # only uppercase country codes are accepted
-    isvalidcode(code) || throw(ArgumentError("please provide standard ISO 3 country codes"))
+    isvalidcode(code) || throw(ArgumentError("please provide standard ISO 3166 Alpha 3 country codes"))
 
     dataid = "GADM_$code"
 
