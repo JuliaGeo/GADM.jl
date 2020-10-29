@@ -9,6 +9,7 @@ DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [compat]
+ArchGDAL = "0.5"
 DataDeps = "0.7"
 julia = "1"
 
