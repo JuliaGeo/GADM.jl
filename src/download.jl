@@ -16,21 +16,23 @@ end
 """
     download(dataset_code) 
 
-Registers and downloads the desired dataset.
+Registers,downloads and returns the Absolute path of the desired dataset.
 """
 function download(dataid)
     # TODO: Implement a `isvalid()` function to validate dataid
-    # This uses register function of DataDeps package
-    # Registers the dataset to be used
-    register(
-        DataDep(
-            dataid,
-            "GADM dataset for $dataid",
-            dataurl(dataid),
-            post_fetch_method=DataDeps.unpack
-        )
-    )
 
-    # downloading the dataset if not available
-    @datadep_str dataid
+    # Registers the dataset to be used
+    try
+        return @datadep_str dataid
+    catch KeyError
+        register(
+            DataDep(
+                dataid,
+                "GADM dataset for $dataid",
+                dataurl(dataid),
+                post_fetch_method=DataDeps.unpack
+            )
+        )
+        return @datadep_str dataid
+    end
 end
