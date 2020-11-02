@@ -72,10 +72,11 @@ end
 Returns the MULTIPOLYGON data for the requested region.\n
 Input: ISO3 Country Code, and further subdivisions\n
 
-Examples:\n
-1. `get("IND")` - Returns polygon of India
-2. `get("IND", "Uttar Pradesh")` - Returns polygon of the state Uttar Pradesh
-3. `get("IND", "Uttar Pradesh", "Lucknow")` - Returns polygon of district Lucknow\n
+## Examples  
+  
+`get("IND")` # Returns polygon of India  
+`get("IND", "Uttar Pradesh")` # Returns polygon of the state Uttar Pradesh  
+`get("IND", "Uttar Pradesh", "Lucknow")` # Returns polygon of district Lucknow  
 """
 function get(country, levels...) 
     # only uppercase country codes are accepted
@@ -102,10 +103,11 @@ function get(country, levels...)
 
     nfeatures = ArchGDAL.nfeature(level)
 
-    # indexes of fields with entity full names
-    # name of i level entity is at index at indexes[i+1]
-    # Eg. Name of state (level 1) "Uttar Pradesh" will be found at index name_indexes[2], i.e. 3rd field
-    name_indexes = [0, 3, 6]
+    # Fields NAME_0, NAME_1.. of a feature contain Country's name, State's name etc.
+    # ArchGDAL API doesn't allow to fetch field by it's name, field numbers are required
+    # name_indexes are the field numbers of these fields which contain full names for filtering purposes
+    # NAME_0 is at index 1, NAME_1 is at index 3 and so on
+    name_indexes = [1, 3, 6]
 
     # looping on all features in the layer
     for ifeature = 1:nfeatures
