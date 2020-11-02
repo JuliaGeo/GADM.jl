@@ -95,7 +95,7 @@ function get(country, levels...)
 
     # get country level
     if required_level == 0
-        return ArchGDAL.getfeature(level, ifeature) do feature
+        return ArchGDAL.getfeature(level, 1) do feature
             ArchGDAL.getgeom(feature)
         end
     end
