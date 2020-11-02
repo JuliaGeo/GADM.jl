@@ -11,6 +11,12 @@
     # valid country code
     polygon = Geography.get("IND")
     @test typeof(polygon) === ArchGDAL.IGeometry
+
+    level1 = Geography.get("IND", "Uttar Pradesh")
+    @test typeof(polygon) === ArchGDAL.IGeometry
+
+    # throws error when query is invalid
+    @test_throws ArgumentError Geography.get("IND", "Rio De Janerio")
 end
 
 @testset "isvalidcode" begin
