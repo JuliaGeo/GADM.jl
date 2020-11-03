@@ -6,7 +6,7 @@ function getlevel(dataset::ArchGDAL.AbstractDataset, reqlevel::Int)
     # number of layers in the dataset
     nlayers = ArchGDAL.nlayer(dataset)
 
-    for i = 0:nlayers-1
+    for i = 0:nlayers - 1
         layer = ArchGDAL.getlayer(dataset, i)
         layername = ArchGDAL.getname(layer)
         layerlevel = split(layername, "_")[end]
@@ -15,7 +15,7 @@ function getlevel(dataset::ArchGDAL.AbstractDataset, reqlevel::Int)
         end
     end
 
-    throw(ArgumentError("valid levels for the given dataset are 0...$(nlayers-1)"))
+    throw(ArgumentError("valid levels for the given dataset are 0...$(nlayers - 1)"))
 end
 
 """
@@ -68,19 +68,64 @@ end
 
 
 """
-    get(code)
-Returns the MULTIPOLYGON data for the requested country.\n
-Input: ISO 3166 Alpha 3 Country Code
-"""
-function get(code)
-    # only uppercase country codes are accepted
-    isvalidcode(code) || throw(ArgumentError("please provide standard ISO 3166 Alpha 3 country codes"))
+    get(country, levels...)
+Returns the MULTIPOLYGON data for the requested region.\n
+Input: ISO3 Country Code, and further subdivisions\n
 
-    dataid = "GADM_$code"
+## Examples  
+  
+`get("IND")` # Returns polygon of India  
+`get("IND", "Uttar Pradesh")` # Returns polygon of the state Uttar Pradesh  
+`get("IND", "Uttar Pradesh", "Lucknow")` # Returns polygon of district Lucknow  
+"""
+function get(country, levels...) 
+    # only uppercase country codes are accepted
+    isvalidcode(country) || throw(ArgumentError("please provide standard ISO 3 country codes"))
+
+    dataid = "GADM_$country"
 
     resource_data_path = download(dataid)
 
     dataset = extractdataset(resource_data_path)
 
-    extractgeometry(dataset)
+    # the number of varargs in levels is the required level for GADM dataset
+    required_level = length(levels)
+
+    # get layer of the required level
+    level = getlevel(dataset, required_level)
+
+    # get country level
+    if required_level == 0
+        return ArchGDAL.getfeature(level, 1) do feature
+            ArchGDAL.getgeom(feature)
+        end
+    end
+
+    nfeatures = ArchGDAL.nfeature(level)
+
+    # Fields NAME_0, NAME_1.. of a feature contain Country's name, State's name etc.
+    # ArchGDAL API doesn't allow to fetch field by it's name, field numbers are required
+    # name_indexes are the field numbers of these fields which contain full names for filtering purposes
+    # NAME_0 is at index 1, NAME_1 is at index 3 and so on
+    name_indexes = [1, 3, 6]
+
+    # looping on all features in the layer
+    for ifeature = 1:nfeatures
+
+        geometry = ArchGDAL.getfeature(level, ifeature) do feature
+
+            field_name = ArchGDAL.getfield(feature, name_indexes[required_level + 1])
+
+            # if query exists in field name, it matches and returns geometry
+            if occursin(lowercase(levels[end]), lowercase(field_name))
+                return ArchGDAL.getgeom(feature)
+            end
+        end
+
+        # if geometry is not nothing, requried shape has been found
+        if !isnothing(geometry)
+            return geometry
+        end
+    end
+    throw(ArgumentError("feature not found"))
 end
