@@ -95,7 +95,6 @@ end
 end
 
 @testset "correct geometry" begin
-
     geom = GADM.get("VAT")
 
     bounds = ArchGDAL.envelope(geom)
@@ -109,5 +108,4 @@ end
         diff = abs(bounds_arr[i] - bounds_actual[i])
         @test diff < 0.01
     end
-
 end
