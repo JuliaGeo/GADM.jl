@@ -1,4 +1,4 @@
-module Geography
+module GADM
 
 using DataDeps
 using Logging
