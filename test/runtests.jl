@@ -7,8 +7,7 @@ using ArchGDAL
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true
 
 testfiles = [
-    "download.jl",
-    "polygon.jl"
+    "GADM.jl",
 ]
 
 @testset "Geography.jl" begin
