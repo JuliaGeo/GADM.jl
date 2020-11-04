@@ -93,3 +93,21 @@ end
     feature_layer = GADM.getlevel(dataset, 0)
     @test typeof(feature_layer) === ArchGDAL.IFeatureLayer
 end
+
+@testset "correct geometry" begin
+
+    geom = GADM.get("VAT")
+
+    bounds = ArchGDAL.envelope(geom)
+
+    bounds_arr = [bounds.MinX, bounds.MaxX, bounds.MinY, bounds.MaxY]
+
+    # Vatican City bounding boxes lat min 41.9002044 lat max 41.9073912 lon min 12.4457442 lon max 12.4583653
+    bounds_actual = [12.4457442, 12.4583653, 41.9002044, 41.9073912]
+
+    for i = 1:4
+        diff = abs(bounds_arr[i] - bounds_actual[i])
+        @test diff < 0.01
+    end
+
+end
