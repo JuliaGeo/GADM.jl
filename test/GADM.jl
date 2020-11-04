@@ -65,7 +65,7 @@ end
 end
 
 @testset "extractdataset" begin
-    resource_data_path = GADM.download("GADM_VAT")
+    resource_data_path = GADM.download("GADM_IND")
 
     dataset = GADM.extractdataset(resource_data_path)
     @test typeof(dataset) === ArchGDAL.IDataset
@@ -74,7 +74,7 @@ end
 end
 
 @testset "extractgeometry" begin
-    resource_data_path = GADM.download("GADM_VAT")
+    resource_data_path = GADM.download("GADM_IND")
     
     dataset = GADM.extractdataset(resource_data_path)
 
@@ -83,7 +83,7 @@ end
 end
 
 @testset "getlevel" begin
-    resource_data_path = GADM.download("GADM_VAT")
+    resource_data_path = GADM.download("GADM_IND")
     dataset = GADM.extractdataset(resource_data_path)
 
     # incorrect level
