@@ -1,4 +1,4 @@
-name = "Geography"
+name = "GADM"
 uuid = "a8dd9ffe-31dc-4cf5-a379-ea69100a8233"
 authors = ["Aayush Joglekar <aayushjog@gmail.com> and contributors"]
 version = "0.1.0"

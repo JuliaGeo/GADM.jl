@@ -1,4 +1,4 @@
-using Geography
+using GADM
 using Test
 using DataDeps
 using ArchGDAL
@@ -10,7 +10,7 @@ testfiles = [
     "GADM.jl",
 ]
 
-@testset "Geography.jl" begin
+@testset "GADM.jl" begin
   for testfile in testfiles
     include(testfile)
   end
