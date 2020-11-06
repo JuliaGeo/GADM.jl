@@ -7,6 +7,40 @@
     @test !GADM.isvalidcode("iNd4")
 end
 
+function getmeshespolygon(polygon)
+    #converts [Float, Float] to Meshes Point object
+    topoint2f = x -> Meshes.Point2f(x)
+    coordinates = GeoInterface.coordinates(polygon)
+
+    if isa(coordinates, GeoInterface.MultiPolygon)
+        outer = map(topoint2f, first(coordinates[1]))
+        inner = []
+        if length(coordinates) > 1
+            for ring in coordinates[2:end]
+                push!(inner, map(topoint2f, first(ring)))
+            end
+        end
+        return Meshes.Polygon(outer, inner)
+    else
+        outer = map(topoint2f, first(coordinates))
+        return Meshes.Polygon(outer)
+    end
+end
+
+@testset "dataurl" begin
+    # dataurl returns a string on proper formatted code GADM_<Code>
+    @test isequal(GADM.dataurl("GADM_IND"), "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_IND_gpkg.zip")
+
+    # dataurl returns nothing on improper formatted code GADM<Code>    
+    @test_throws ArgumentError GADM.dataurl("GADMIND")
+
+    # dataurl returns nothing when code doesn't contain GADM
+    @test_throws ArgumentError GADM.dataurl("IND")
+
+    # dataurl returns nothing on empty string
+    @test_throws ArgumentError GADM.dataurl("")
+end
+
 @testset "download" begin
     # test successful download
     GADM.download("USA")
