@@ -146,6 +146,21 @@ function getmeshespolygon(geometry)
     end
 end
 
+@testset "coordinates" begin
+    # invalid country code: lowercase
+    @test_throws ArgumentError GADM.coordinates("ind")    
+    # empty country code
+    @test_throws ArgumentError GADM.coordinates("")   
+    # invalid code other than format [A-Z]{3}
+    @test_throws ArgumentError GADM.coordinates("IND4") 
+    # Polygon
+    c = GADM.coordinates("VAT")
+    @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
+    # MultiPolygon
+    c = GADM.coordinates("IND", "Gujarat")
+    @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
+end
+
 @testset "meshes polygon" begin
     # testing a complex polygon: State of Gujarat in India
     gujarat = GADM.polygon("IND", "Gujarat")

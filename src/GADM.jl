@@ -199,7 +199,7 @@ Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivi
 function coordinates(country, levels...)
     p = polygon(country, levels...)
     c = GeoInterface.coordinates(p)
-    p isa GeoInterface.MultiPolygon ? c : [c]
+    string(ArchGDAL.getgeomtype(p)) === "wkbMultiPolygon" ? c : [c]
 end
 
 end
