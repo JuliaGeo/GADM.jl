@@ -15,6 +15,7 @@ julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Meshes = "eacbb407-ea5a-433e-ab97-5258b1ca43fa"
 
 [targets]
-test = ["Test"]
+test = ["Test", "Meshes"]
