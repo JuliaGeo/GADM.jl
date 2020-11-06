@@ -79,11 +79,57 @@ end
     @test typeof(polygon) == ArchGDAL.IGeometry
 
     # throws error when query is invalid
-    @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
+    @test_throws ArgumentError GADM.polygon("IND", "Rio De Janerio")
+end
+
+@testset "isvalidcode" begin
+    @test GADM.isvalidcode("ind") === false
+
+    @test GADM.isvalidcode("") === false
+
+    @test GADM.isvalidcode("iNd4") === false
+
+    @test GADM.isvalidcode("IND") === true
+end
+
+@testset "isgpkg" begin
+    @test GADM.isgpkg("path.gpkg") === true
+
+    @test GADM.isgpkg("path.mp4") === false
+end
+
+@testset "extractdataset" begin
+    resource_data_path = GADM.download("GADM_IND")
+
+    dataset = GADM.extractdataset(resource_data_path)
+    @test typeof(dataset) === ArchGDAL.IDataset
+
+    @test_throws SystemError GADM.extractdataset("")
+end
+
+@testset "extractgeometry" begin
+    resource_data_path = GADM.download("GADM_IND")
+    
+    dataset = GADM.extractdataset(resource_data_path)
+
+    geometry = GADM.extractgeometry(dataset)
+    @test typeof(geometry) === ArchGDAL.IGeometry
+end
+
+@testset "getlevel" begin
+    resource_data_path = GADM.download("GADM_IND")
+    dataset = GADM.extractdataset(resource_data_path)
+
+    # incorrect level
+    @test_throws ArgumentError GADM.getlevel(dataset, 10)
+
+    # correct level
+    feature_layer = GADM.getlevel(dataset, 0)
+    @test typeof(feature_layer) === ArchGDAL.IFeatureLayer
 end
 
 @testset "basic" begin
-    geom = GADM.get("VAT")
+    geom = GADM.polygon("VAT")
 
     bounds = ArchGDAL.envelope(geom)
 
