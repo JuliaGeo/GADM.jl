@@ -134,7 +134,7 @@ function get(country, subregions...)
 """
     polygon(country, levels...)
 Returns a GeoInterface compliant POLYGON/MULTIPOLYGON for the requested region.\n
-Input: ISO3 Country Code, and further full official names of subdivisions\n
+Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions\n
 
 ## Examples  
   
@@ -188,7 +188,7 @@ end
 """
     coordinates(country, levels...)
 Returns a deep array of Float64 coordinates for the requested region.\n
-Input: ISO3 Country Code, and further full official names of subdivisions\n
+Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions\n
 
 ## Examples  
   
