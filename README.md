@@ -1,5 +1,5 @@
 <p align="center">
-<!--   <img src="docs/ExtremeStats.png" height="200"><br> -->
+  <img src="docs/banner.png"><br>
   <a href="https://travis-ci.com/zerefwayne/GADM.jl">
     <img src="https://travis-ci.com/zerefwayne/GADM.jl.svg?branch=master">
   </a>
