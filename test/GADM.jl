@@ -10,9 +10,9 @@ end
 function getmeshespolygon(polygon)
     #converts [Float, Float] to Meshes Point object
     topoint2f = x -> Meshes.Point2f(x)
-    coordinates = GeoInterface.coordinates(polygon)
+    coordinates = GeoInterface.coordinates(geometry)
 
-    if isa(coordinates, GeoInterface.MultiPolygon)
+    if string(ArchGDAL.getgeomtype(geometry)) === "wkbMultiPolygon"
         outer = map(topoint2f, first(coordinates[1]))
         inner = []
         if length(coordinates) > 1
