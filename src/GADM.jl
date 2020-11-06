@@ -9,6 +9,7 @@ import Meshes
 import GeoInterface
 
 """
+<<<<<<< HEAD
     getmeshespolygon(country, levels...)
 Returns a Meshes.jl polygon for the requested region.\n
 Input: ISO3 Country Code, and further subdivisions\n
@@ -49,6 +50,9 @@ end
 
 """
     download(country) 
+=======
+    dataurl(dataid)
+>>>>>>> Add coordinates and rename get=>polygon
 
 Downloads data for `country` using DataDeps.jl and returns path.
 """
@@ -114,6 +118,7 @@ isvalidcode(str) = match(r"\b[A-Z]{3}\b", str) !== nothing
 
 Returns the MULTIPOLYGON data for the requested region.
 
+<<<<<<< HEAD
 Input: ISO 3 country code, and further subdivisions.
 
 ## Examples  
@@ -125,6 +130,21 @@ get("IND", "Uttar Pradesh", "Lucknow")
 ```
 """
 function get(country, subregions...) 
+=======
+"""
+    polygon(country, levels...)
+Returns a GeoInterface compliant POLYGON/MULTIPOLYGON for the requested region.\n
+Input: ISO3 Country Code, and further full official names of subdivisions\n
+
+## Examples  
+  
+`polygon("IND")` # Returns polygon of India  
+`polygon("IND", "Uttar Pradesh")` # Returns polygon of the state Uttar Pradesh  
+`polygon("IND", "Uttar Pradesh", "Lucknow")` # Returns polygon of district Lucknow  
+"""
+function polygon(country, levels...) 
+    # only uppercase country codes are accepted
+>>>>>>> Add coordinates and rename get=>polygon
     isvalidcode(country) || throw(ArgumentError("please provide standard ISO 3 country codes"))
 
     data = country |> download |> dataread
@@ -163,6 +183,23 @@ function get(country, subregions...)
     end
 
     throw(ArgumentError("feature not found"))
+end
+
+"""
+    coordinates(country, levels...)
+Returns a deep array of Float64 coordinates for the requested region.\n
+Input: ISO3 Country Code, and further full official names of subdivisions\n
+
+## Examples  
+  
+`coordinates("IND")` # Returns array of coordinates of India  
+`coordinates("IND", "Uttar Pradesh")` # Returns array of coordinates of the state Uttar Pradesh  
+`coordinates("IND", "Uttar Pradesh", "Lucknow")` # Returns array of coordinates of district Lucknow  
+"""
+function coordinates(country, levels...)
+    p = polygon(country, levels...)
+    c = GeoInterface.coordinates(p)
+    p isa GeoInterface.MultiPolygon ? c : [c]
 end
 
 end
