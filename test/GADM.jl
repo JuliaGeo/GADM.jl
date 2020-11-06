@@ -7,26 +7,6 @@
     @test !GADM.isvalidcode("iNd4")
 end
 
-function getmeshespolygon(polygon)
-    #converts [Float, Float] to Meshes Point object
-    topoint2f = x -> Meshes.Point2f(x)
-    coordinates = GeoInterface.coordinates(geometry)
-
-    if string(ArchGDAL.getgeomtype(geometry)) === "wkbMultiPolygon"
-        outer = map(topoint2f, first(coordinates[1]))
-        inner = []
-        if length(coordinates) > 1
-            for ring in coordinates[2:end]
-                push!(inner, map(topoint2f, first(ring)))
-            end
-        end
-        return Meshes.Polygon(outer, inner)
-    else
-        outer = map(topoint2f, first(coordinates))
-        return Meshes.Polygon(outer)
-    end
-end
-
 @testset "dataurl" begin
     # dataurl returns a string on proper formatted code GADM_<Code>
     @test isequal(GADM.dataurl("GADM_IND"), "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_IND_gpkg.zip")
@@ -142,4 +122,53 @@ end
         diff = abs(bounds_arr[i] - bounds_actual[i])
         @test diff < 0.01
     end
+end
+
+function getmeshespolygon(geometry)
+    #converts [Float, Float] to Meshes Point object
+    topoint2f = x -> Meshes.Point(x)
+    coordinates = GeoInterface.coordinates(geometry)
+
+    if string(ArchGDAL.getgeomtype(geometry)) === "wkbMultiPolygon"
+        outer = map(topoint2f, first(coordinates[1]))
+        reverse!(outer)
+        inner = []
+        if length(coordinates) > 1
+            for ring in coordinates[2:end]
+                push!(inner, map(topoint2f, first(ring)))
+            end
+        end
+        return Meshes.Polygon(outer, inner)
+    else
+        outer = map(topoint2f, first(coordinates))
+        reverse!(outer)
+        return Meshes.Polygon(outer)
+    end
+end
+
+@testset "meshes polygon" begin
+    # testing a complex polygon: State of Gujarat in India
+    gujarat = GADM.polygon("IND", "Gujarat")
+    gujarat_mp = getmeshespolygon(gujarat)
+
+    @test Meshes.issimple(gujarat_mp) == false
+    @test Meshes.hasholes(gujarat_mp) == true
+
+    orientation = Meshes.orientation(gujarat_mp)
+
+    @test orientation isa Tuple
+    @test orientation[1] == :CCW
+    @test all(orientation[2] .== :CW)
+
+    # testing a simple polygon: Vatican City
+    vatican = GADM.polygon("VAT")
+    vatican_mp = getmeshespolygon(vatican)
+
+    @test Meshes.issimple(vatican_mp) == true
+    @test Meshes.hasholes(vatican_mp) == false
+
+    orientation = Meshes.orientation(vatican_mp)
+
+    @test orientation isa Symbol
+    @test orientation == :CCW
 end
