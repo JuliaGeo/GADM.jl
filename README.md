@@ -1,7 +1,7 @@
 <p align="center">
 <!--   <img src="docs/ExtremeStats.png" height="200"><br> -->
   <a href="https://travis-ci.com/zerefwayne/GADM.jl">
-    <img src="hhttps://travis-ci.com/zerefwayne/GADM.jl.svg?branch=master">
+    <img src="https://travis-ci.com/zerefwayne/GADM.jl.svg?branch=master">
   </a>
   <a href="https://codecov.io/gh/zerefwayne/GADM.jl">
     <img src="https://codecov.io/gh/zerefwayne/GADM.jl/branch/master/graph/badge.svg">
