@@ -2,7 +2,50 @@ module GADM
 
 using DataDeps
 using ArchGDAL
+<<<<<<< HEAD
 using Logging
+=======
+import Meshes
+import GeoInterface
+
+"""
+    getmeshespolygon(country, levels...)
+Returns a Meshes.jl polygon for the requested region.\n
+Input: ISO3 Country Code, and further subdivisions\n
+
+## Examples  
+  
+`get("IND")` # Returns polygon of India  
+`get("IND", "Uttar Pradesh")` # Returns polygon of the state Uttar Pradesh  
+`get("IND", "Uttar Pradesh", "Lucknow")` # Returns polygon of district Lucknow  
+"""
+function getmeshespolygon(country, levels...)
+    #converts [Float, Float] to Meshes Point object
+    topoint2f = x -> Meshes.Point2f(x)
+    # pass parameters to get
+    polygon = get(country, levels...)
+    # extract array of coordinates
+    coordinates = GeoInterface.coordinates(polygon)
+
+    if isa(coordinates, Array{Array{Array{Array{Float64,1},1},1},1})
+        # MULTIPOLYGON
+        outer = map(topoint2f, first(coordinates[1]))
+        inner = []
+        if length(coordinates) > 1
+            for ring in coordinates[2:end]
+                push!(inner, map(topoint2f, first(ring)))
+            end
+        end
+        meshes_polygon = Meshes.Polygon(outer, inner)
+        return meshes_polygon
+    else
+        # POLYGON
+        outer = map(topoint2f, first(coordinates))
+        meshes_polygon = Meshes.Polygon(outer)
+        return meshes_polygon
+    end
+end
+>>>>>>> Add getmeshespolygon
 
 """
     download(country) 
