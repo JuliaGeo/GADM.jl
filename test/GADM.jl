@@ -7,28 +7,14 @@
     @test !GADM.isvalidcode("iNd4")
 end
 
-@testset "dataurl" begin
-    # dataurl returns a string on proper formatted code GADM_<Code>
-    @test isequal(GADM.dataurl("GADM_IND"), "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_IND_gpkg.zip")
-
-    # dataurl returns nothing on improper formatted code GADM<Code>    
-    @test_throws ArgumentError GADM.dataurl("GADMIND")
-
-    # dataurl returns nothing when code doesn't contain GADM
-    @test_throws ArgumentError GADM.dataurl("IND")
-
-    # dataurl returns nothing on empty string
-    @test_throws ArgumentError GADM.dataurl("")
-end
-
 @testset "download" begin
     # test successful download
-    GADM.download("USA")
-    @test_nowarn @datadep_str "USA"
+    GADM.download("VAT")
+    @test_nowarn @datadep_str "VAT"
 end
 
 @testset "dataread" begin
-    path = GADM.download("IND")
+    path = GADM.download("VAT")
     data = GADM.dataread(path)
     @test typeof(data) === ArchGDAL.IDataset
 end
@@ -62,54 +48,8 @@ end
     @test_throws ArgumentError GADM.polygon("IND", "Rio De Janerio")
 end
 
-@testset "isvalidcode" begin
-    @test GADM.isvalidcode("ind") === false
-
-    @test GADM.isvalidcode("") === false
-
-    @test GADM.isvalidcode("iNd4") === false
-
-    @test GADM.isvalidcode("IND") === true
-end
-
-@testset "isgpkg" begin
-    @test GADM.isgpkg("path.gpkg") === true
-
-    @test GADM.isgpkg("path.mp4") === false
-end
-
-@testset "extractdataset" begin
-    resource_data_path = GADM.download("GADM_IND")
-
-    dataset = GADM.extractdataset(resource_data_path)
-    @test typeof(dataset) === ArchGDAL.IDataset
-
-    @test_throws SystemError GADM.extractdataset("")
-end
-
-@testset "extractgeometry" begin
-    resource_data_path = GADM.download("GADM_IND")
-    
-    dataset = GADM.extractdataset(resource_data_path)
-
-    geometry = GADM.extractgeometry(dataset)
-    @test typeof(geometry) === ArchGDAL.IGeometry
-end
-
-@testset "getlevel" begin
-    resource_data_path = GADM.download("GADM_IND")
-    dataset = GADM.extractdataset(resource_data_path)
-
-    # incorrect level
-    @test_throws ArgumentError GADM.getlevel(dataset, 10)
-
-    # correct level
-    feature_layer = GADM.getlevel(dataset, 0)
-    @test typeof(feature_layer) === ArchGDAL.IFeatureLayer
-end
-
 @testset "basic" begin
-    geom = GADM.polygon("VAT")
+    geom = GADM.get("VAT")
 
     bounds = ArchGDAL.envelope(geom)
 
@@ -163,7 +103,7 @@ end
 
 @testset "meshes polygon" begin
     # testing a complex polygon: State of Gujarat in India
-    gujarat = GADM.polygon("IND", "Gujarat")
+    gujarat = GADM.get("IND", "Gujarat")
     gujarat_mp = getmeshespolygon(gujarat)
 
     @test Meshes.issimple(gujarat_mp) == false
@@ -176,7 +116,7 @@ end
     @test all(orientation[2] .== :CW)
 
     # testing a simple polygon: Vatican City
-    vatican = GADM.polygon("VAT")
+    vatican = GADM.get("VAT")
     vatican_mp = getmeshespolygon(vatican)
 
     @test Meshes.issimple(vatican_mp) == true
