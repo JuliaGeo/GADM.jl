@@ -64,27 +64,6 @@ end
     end
 end
 
-function getmeshespolygon(geometry)
-    # TODO refactor function
-    #converts [Float, Float] to Meshes Point object
-    topoint = x -> Meshes.Point(x)
-    coordinates = GeoInterface.coordinates(geometry)
-
-    if string(ArchGDAL.getgeomtype(geometry)) === "wkbMultiPolygon"
-        outer = map(topoint, first(coordinates[1]))
-        inner = []
-        if length(coordinates) > 1
-            for ring in coordinates[2:end]
-                push!(inner, map(topoint, first(ring)))
-            end
-        end
-        return Meshes.Polygon(outer, inner)
-    else
-        outer = map(topoint, first(coordinates))
-        return Meshes.Polygon(outer)
-    end
-end
-
 @testset "coordinates" begin
     # invalid country code: lowercase
     @test_throws ArgumentError GADM.coordinates("ind")    
