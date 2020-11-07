@@ -8,9 +8,9 @@ using GeoInterface
 """
     isvalidcode(str)
 
-Tells whether or not `str` is a valid  
-ISO 3166 Alpha 3 country code. Valid  
-code examples are "IND", "USA", "BRA".  
+Tells whether or not `str` is a valid
+ISO 3166 Alpha 3 country code. Valid 
+code examples are "IND", "USA", "BRA".
 """
 isvalidcode(str) = match(r"\b[A-Z]{3}\b", str) !== nothing
 
@@ -87,7 +87,7 @@ function get(country, subregions...)
 
     data = country |> download |> dataread
 
-    forcemultipolygon = function(geom)
+    multipolygon = function(geom)
        if GeoInterface.geotype(geom) == :Polygon
         mp = ArchGDAL.createmultipolygon()
         ArchGDAL.addgeom!(mp, geom)
@@ -106,7 +106,7 @@ function get(country, subregions...)
     # which happens to be the first feature of the layer
     if isempty(subregions)
         return ArchGDAL.getfeature(layer, 1) do feature
-            forcemultipolygon(ArchGDAL.getgeom(feature))
+            multipolygon(ArchGDAL.getgeom(feature))
         end
     end
 
@@ -124,10 +124,10 @@ function get(country, subregions...)
         geometry = ArchGDAL.getfeature(layer, i) do feature
             field = ArchGDAL.getfield(feature, indices[level+1])
             if occursin(lowercase(target), lowercase(field))
-                return forcemultipolygon(ArchGDAL.getgeom(feature))
+                return multipolygon(ArchGDAL.getgeom(feature))
             end
         end
-        isnothing(geometry) || return forcemultipolygon(geometry)
+        isnothing(geometry) || return multipolygon(geometry)
     end
 
     throw(ArgumentError("feature not found"))
