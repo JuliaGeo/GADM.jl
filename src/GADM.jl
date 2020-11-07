@@ -87,6 +87,16 @@ function get(country, subregions...)
 
     data = country |> download |> dataread
 
+    forcemultipolygon = function(geom)
+       if GeoInterface.geotype(geom) == :Polygon
+        mp = ArchGDAL.createmultipolygon()
+        ArchGDAL.addgeom!(mp, geom)
+        return mp
+       else
+        return geom
+       end
+    end
+
     level = length(subregions)
 
     # zoom into the appropriate layer for the query
@@ -96,7 +106,7 @@ function get(country, subregions...)
     # which happens to be the first feature of the layer
     if isempty(subregions)
         return ArchGDAL.getfeature(layer, 1) do feature
-            ArchGDAL.getgeom(feature)
+            forcemultipolygon(ArchGDAL.getgeom(feature))
         end
     end
 
@@ -114,17 +124,17 @@ function get(country, subregions...)
         geometry = ArchGDAL.getfeature(layer, i) do feature
             field = ArchGDAL.getfield(feature, indices[level+1])
             if occursin(lowercase(target), lowercase(field))
-                return ArchGDAL.getgeom(feature)
+                return forcemultipolygon(ArchGDAL.getgeom(feature))
             end
         end
-        isnothing(geometry) || return geometry
+        isnothing(geometry) || return forcemultipolygon(geometry)
     end
 
     throw(ArgumentError("feature not found"))
 end
 
 """
-    coordinates(country, levels...)  
+    coordinates(country, subregions...)  
 
 Returns a deep array of coordinates for the requested region.  
 Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions  
@@ -138,10 +148,6 @@ julia> coordinates("VAT") # Returns a deep array of Vatican city
  [[[12.455550193786678, 41.90755081176758], ..., [12.454191207885799, 41.90721130371094], [12.455550193786678, 41.90755081176758]]]
 ```
 """
-function coordinates(country, subregions...)
-    p = get(country, subregions...)
-    c = GeoInterface.coordinates(p)
-    GeoInterface.geotype(p) == :Polygon ? [c] : c
-end
+coordinates(country, subregions...) = GeoInterface.coordinates(get(country, subregions...))
 
 end
