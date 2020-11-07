@@ -2,7 +2,6 @@ using GADM
 using Test
 using DataDeps
 using ArchGDAL
-using Meshes
 import GeoInterface
 
 # DataDeps always downloads the data if it doesn't exist
