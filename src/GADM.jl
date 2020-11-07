@@ -9,7 +9,7 @@ using GeoInterface
     isvalidcode(str)
 
 Tells whether or not `str` is a valid
-ISO 3166 Alpha 3 country code. Valid 
+ISO 3166 Alpha 3 country code. Valid
 code examples are "IND", "USA", "BRA".
 """
 isvalidcode(str) = match(r"\b[A-Z]{3}\b", str) !== nothing
