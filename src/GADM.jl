@@ -87,7 +87,7 @@ function get(country, subregions...)
 
     data = country |> download |> dataread
 
-    multipolygon = function(geom)
+    function multipolygon(geom)
        if GeoInterface.geotype(geom) == :Polygon
         mp = ArchGDAL.createmultipolygon()
         ArchGDAL.addgeom!(mp, geom)
