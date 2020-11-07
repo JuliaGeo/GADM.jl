@@ -39,10 +39,10 @@ end
 
     # valid country codes
     polygon = GADM.get("IND")
-    @test typeof(polygon) == ArchGDAL.IGeometry
+    @test GeoInterface.geotype(polygon) == :MultiPolygon
 
     polygon = GADM.get("IND", "Uttar Pradesh")
-    @test typeof(polygon) == ArchGDAL.IGeometry
+    @test GeoInterface.geotype(polygon) == :MultiPolygon
 
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
