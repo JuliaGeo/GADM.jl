@@ -99,27 +99,3 @@ end
     c = GADM.coordinates("IND", "Gujarat")
     @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
 end
-
-@testset "meshes polygon" begin
-    # testing a complex polygon: State of Gujarat in India
-    gujarat = GADM.get("IND", "Gujarat")
-    gujarat_mp = getmeshespolygon(gujarat)
-
-    @test Meshes.issimple(gujarat_mp) == false
-    @test Meshes.hasholes(gujarat_mp) == true
-
-    orientation = Meshes.orientation(gujarat_mp)
-
-    @test orientation isa Tuple
-
-    # testing a simple polygon: Vatican City
-    vatican = GADM.get("VAT")
-    vatican_mp = getmeshespolygon(vatican)
-
-    @test Meshes.issimple(vatican_mp) == true
-    @test Meshes.hasholes(vatican_mp) == false
-
-    orientation = Meshes.orientation(vatican_mp)
-
-    @test orientation isa Symbol
-end
