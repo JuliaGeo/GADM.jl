@@ -45,7 +45,7 @@ end
     @test typeof(polygon) == ArchGDAL.IGeometry
 
     # throws error when query is invalid
-    @test_throws ArgumentError GADM.polygon("IND", "Rio De Janerio")
+    @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
 end
 
 @testset "basic" begin
@@ -65,23 +65,22 @@ end
 end
 
 function getmeshespolygon(geometry)
+    # TODO refactor function
     #converts [Float, Float] to Meshes Point object
-    topoint2f = x -> Meshes.Point(x)
+    topoint = x -> Meshes.Point(x)
     coordinates = GeoInterface.coordinates(geometry)
 
     if string(ArchGDAL.getgeomtype(geometry)) === "wkbMultiPolygon"
-        outer = map(topoint2f, first(coordinates[1]))
-        reverse!(outer)
+        outer = map(topoint, first(coordinates[1]))
         inner = []
         if length(coordinates) > 1
             for ring in coordinates[2:end]
-                push!(inner, map(topoint2f, first(ring)))
+                push!(inner, map(topoint, first(ring)))
             end
         end
         return Meshes.Polygon(outer, inner)
     else
-        outer = map(topoint2f, first(coordinates))
-        reverse!(outer)
+        outer = map(topoint, first(coordinates))
         return Meshes.Polygon(outer)
     end
 end
@@ -112,7 +111,7 @@ end
     orientation = Meshes.orientation(gujarat_mp)
 
     @test orientation isa Tuple
-    @test orientation[1] == :CCW
+    @test orientation[1] == :CW
     @test all(orientation[2] .== :CW)
 
     # testing a simple polygon: Vatican City
@@ -125,5 +124,5 @@ end
     orientation = Meshes.orientation(vatican_mp)
 
     @test orientation isa Symbol
-    @test orientation == :CCW
+    @test orientation == :CW
 end

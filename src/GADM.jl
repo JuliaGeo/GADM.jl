@@ -124,15 +124,18 @@ function get(country, subregions...)
 end
 
 """
-    coordinates(country, levels...)
-Returns a deep array of Float64 coordinates for the requested region.\n
-Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions\n
+    coordinates(country, levels...)  
+
+Returns a deep array of Float64 coordinates for the requested region.  
+Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions  
 
 ## Examples  
   
-`coordinates("IND")` # Returns array of coordinates of India  
-`coordinates("IND", "Uttar Pradesh")` # Returns array of coordinates of the state Uttar Pradesh  
-`coordinates("IND", "Uttar Pradesh", "Lucknow")` # Returns array of coordinates of district Lucknow  
+```julia
+coordinates("IND") # Returns array of coordinates of India
+coordinates("IND", "Uttar Pradesh") # Returns array of state Uttar Pradesh
+coordinates("IND", "Uttar Pradesh", "Lucknow") # Returns array of coordinates of district Lucknow
+```
 """
 function coordinates(country, levels...)
     p = get(country, levels...)
