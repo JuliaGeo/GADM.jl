@@ -3,7 +3,7 @@ module GADM
 using DataDeps
 using ArchGDAL
 using Logging
-import GeoInterface
+using GeoInterface
 
 """
     isvalidcode(str)
@@ -129,18 +129,19 @@ end
 Returns a deep array of Float64 coordinates for the requested region.  
 Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions  
 
-## Examples  
+## Example:
   
 ```julia
-coordinates("IND") # Returns array of coordinates of India
-coordinates("IND", "Uttar Pradesh") # Returns array of state Uttar Pradesh
-coordinates("IND", "Uttar Pradesh", "Lucknow") # Returns array of coordinates of district Lucknow
+julia> coordinates("VAT") # Returns a deep array of Vatican city
+
+1-element Array{Array{Array{Array{Float64,1},1},1},1}:
+ [[[12.455550193786678, 41.90755081176758], ..., [12.454191207885799, 41.90721130371094], [12.455550193786678, 41.90755081176758]]]
 ```
 """
 function coordinates(country, levels...)
     p = get(country, levels...)
     c = GeoInterface.coordinates(p)
-    string(ArchGDAL.getgeomtype(p)) === "wkbMultiPolygon" ? c : [c]
+    GeoInterface.geotype(p) == :Polygon ? [c] : c
 end
 
 end
