@@ -138,8 +138,8 @@ julia> coordinates("VAT") # Returns a deep array of Vatican city
  [[[12.455550193786678, 41.90755081176758], ..., [12.454191207885799, 41.90721130371094], [12.455550193786678, 41.90755081176758]]]
 ```
 """
-function coordinates(country, levels...)
-    p = get(country, levels...)
+function coordinates(country, subregions...)
+    p = get(country, subregions...)
     c = GeoInterface.coordinates(p)
     GeoInterface.geotype(p) == :Polygon ? [c] : c
 end
