@@ -9,12 +9,12 @@ end
 
 @testset "download" begin
     # test successful download
-    GADM.download("USA")
-    @test_nowarn @datadep_str "USA"
+    GADM.download("VAT")
+    @test_nowarn @datadep_str "VAT"
 end
 
 @testset "dataread" begin
-    path = GADM.download("IND")
+    path = GADM.download("VAT")
     data = GADM.dataread(path)
     @test typeof(data) === ArchGDAL.IDataset
 end
@@ -62,4 +62,19 @@ end
         diff = abs(bounds_arr[i] - bounds_actual[i])
         @test diff < 0.01
     end
+end
+
+@testset "coordinates" begin
+    # invalid country code: lowercase
+    @test_throws ArgumentError GADM.coordinates("ind")    
+    # empty country code
+    @test_throws ArgumentError GADM.coordinates("")   
+    # invalid code other than format [A-Z]{3}
+    @test_throws ArgumentError GADM.coordinates("IND4") 
+    # Polygon
+    c = GADM.coordinates("VAT")
+    @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
+    # MultiPolygon
+    c = GADM.coordinates("IND", "Gujarat")
+    @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
 end
