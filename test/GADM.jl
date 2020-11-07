@@ -111,8 +111,6 @@ end
     orientation = Meshes.orientation(gujarat_mp)
 
     @test orientation isa Tuple
-    @test orientation[1] == :CW
-    @test all(orientation[2] .== :CW)
 
     # testing a simple polygon: Vatican City
     vatican = GADM.get("VAT")
@@ -124,5 +122,4 @@ end
     orientation = Meshes.orientation(vatican_mp)
 
     @test orientation isa Symbol
-    @test orientation == :CW
 end
