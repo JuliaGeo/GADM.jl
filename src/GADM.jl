@@ -126,7 +126,7 @@ end
 """
     coordinates(country, levels...)  
 
-Returns a deep array of Float64 coordinates for the requested region.  
+Returns a deep array of coordinates for the requested region.  
 Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions  
 
 ## Example:
