@@ -3,6 +3,7 @@ module GADM
 using DataDeps
 using ArchGDAL
 using Logging
+using Tables
 using GeoInterface
 
 """
@@ -53,6 +54,16 @@ function dataread(path)
 end
 
 """
+    getdataset(country)
+
+Downloads and extracts dataset of the given country code
+"""
+function getdataset(country)
+    isvalidcode(country) || throw(ArgumentError("please provide standard ISO 3 country codes"))
+    data = country |> download |> dataread
+end
+
+"""
     getlayer(data, level) 
 
 Get layer of the desired `level` from the `data`.
@@ -65,7 +76,7 @@ function getlayer(data, level)
         llevel = last(split(lname, "_"))
         string(level) == llevel && return layer
     end
-    throw(ArgumentError("valid levels are 0...$(nlayers-1)"))
+    throw(ArgumentError("asked for level $(level), valid levels are 0-$(nlayers - 1)"))
 end
 
 """
@@ -84,9 +95,7 @@ get("IND", "Uttar Pradesh", "Lucknow")
 ```
 """
 function get(country, subregions...) 
-    isvalidcode(country) || throw(ArgumentError("please provide standard ISO 3 country codes"))
-
-    data = country |> download |> dataread
+    data = getdataset(country)
 
     function multipolygon(geom)
        if GeoInterface.geotype(geom) == :Polygon
@@ -150,5 +159,43 @@ julia> coordinates("VAT") # Returns a deep array of Vatican city
 ```
 """
 coordinates(country, subregions...) = GeoInterface.coordinates(get(country, subregions...))
+
+"""
+    table(country, subregions...)  
+
+Returns named tuples of the region required and its children  
+Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions  
+"""
+function table(country, subregions...) 
+    data = getdataset(country)
+    nlayers = ArchGDAL.nlayer(data)
+
+    function filterlayer(layer, key, value, all=false)
+        table = ArchGDAL.Table(layer)
+        filtered_rows = []
+        for row in Tables.rows(table)
+            field = row[Symbol(key)]
+            if all || occursin(lowercase(value), lowercase(field))
+                push!(filtered_rows, row)
+            end
+        end
+        return filtered_rows
+    end
+    
+    parent_level = length(subregions)
+    parent_level >= nlayers && throw(ArgumentError("more subregions provided than actual")) 
+    parent_name = isempty(subregions) ? "" : last(subregions)
+    parent_layer = getlayer(data, parent_level)
+    result = filterlayer(parent_layer, "NAME_$(parent_level)", parent_name, iszero(parent_level))
+    isempty(result) && throw(ArgumentError("could not find required region"))
+    parent = first(result)
+    
+    children_level = parent_level + 1
+    children_level == nlayers && return (parent, Tables.rowtable([]))
+    children_layer = getlayer(data, children_level)
+    children = filterlayer(children_layer, "NAME_$(parent_level)", parent_name, iszero(parent_level))
+
+    return (parent, Tables.rowtable(children))
+end
 
 end
