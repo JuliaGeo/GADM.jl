@@ -78,3 +78,26 @@ end
     c = GADM.coordinates("IND", "Gujarat")
     @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
 end
+
+@testset "table" begin
+    # invalid country code: lowercase
+    @test_throws ArgumentError GADM.table("ind")    
+    # empty country code
+    @test_throws ArgumentError GADM.table("")   
+    # invalid code other than format [A-Z]{3}
+    @test_throws ArgumentError GADM.table("IND4") 
+    # invalid region name
+    @test_throws ArgumentError GADM.table("IND", "New York")
+    # more subregions provided than that in database
+    @test_throws ArgumentError GADM.table("VAT", "Pope")
+    # only parent
+    parent, children = GADM.table("IND", "Uttar Pradesh", "Lucknow", "Lucknow")
+    @test parent isa NamedTuple
+    @test children isa Array
+    @test isempty(children)
+    # parent and children
+    parent, children = GADM.table("IND", "Uttar Pradesh", "Lucknow")
+    @test parent isa NamedTuple
+    @test children isa Array
+    @test length(children) == 3 # 3 regions in district Lucknow
+end
