@@ -1,10 +1,10 @@
 <p align="center">
   <img src="docs/banner.png"><br>
-  <a href="https://travis-ci.com/zerefwayne/GADM.jl">
-    <img src="https://travis-ci.com/zerefwayne/GADM.jl.svg?branch=master">
+  <a href="https://travis-ci.com/JuliaGeo/GADM.jl">
+    <img src="https://travis-ci.com/JuliaGeo/GADM.jl.svg?branch=master">
   </a>
-  <a href="https://codecov.io/gh/zerefwayne/GADM.jl">
-    <img src="https://codecov.io/gh/zerefwayne/GADM.jl/branch/master/graph/badge.svg">
+  <a href="https://codecov.io/gh/JuliaGeo/GADM.jl">
+    <img src="https://codecov.io/gh/JuliaGeo/GADM.jl/branch/master/graph/badge.svg">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green.svg">
