@@ -85,14 +85,14 @@ function get(country, subregions...;children=false)
 
     function filterlayer(layer, key, value, all=false)
         table = ArchGDAL.Table(layer)
-        filtered_rows = []
+        filtered = []
         for row in Tables.rows(table)
             field = row[Symbol(key)]
             if all || occursin(lowercase(value), lowercase(field))
-                push!(filtered_rows, row)
+                push!(filtered, row)
             end
         end
-        return Tables.columntable(filtered_rows)
+        return Tables.columntable(filtered)
     end
 
     parent_level = length(subregions)
@@ -102,9 +102,7 @@ function get(country, subregions...;children=false)
     parent = filterlayer(parent_layer, "NAME_$(parent_level)", parent_name, iszero(parent_level))
     isempty(parent) && throw(ArgumentError("could not find required region"))
 
-    if !children
-        return parent
-    end
+    !children && return parent
 
     children_level = parent_level + 1
     children_level == nlayers && return (parent, Tables.rowtable([]))
