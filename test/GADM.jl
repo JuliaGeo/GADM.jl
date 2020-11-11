@@ -10,7 +10,7 @@ end
 @testset "download" begin
     # test successful download
     GADM.download("VAT")
-    @test_nowarn @datadep_str "VAT"
+    @test_nowarn @datadep_str "GADM_VAT"
 end
 
 @testset "dataread" begin
