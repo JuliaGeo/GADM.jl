@@ -115,21 +115,23 @@ function get(country, subregions...;children=false)
         return Tables.columntable(filtered)
     end
 
-    parent_level = length(subregions)
-    parent_level >= nlayers && throw(ArgumentError("more subregions provided than actual")) 
-    parent_name = isempty(subregions) ? "" : last(subregions)
-    parent_layer = getlayer(data, parent_level)
-    parent = filterlayer(parent_layer, "NAME_$(parent_level)", parent_name, iszero(parent_level))
-    isempty(parent) && throw(ArgumentError("could not find required region"))
+    # p -> parent, is the requested region
+    plevel = length(subregions)
+    plevel >= nlayers && throw(ArgumentError("more subregions provided than actual")) 
+    pname = isempty(subregions) ? "" : last(subregions)
+    player = getlayer(data, plevel)
+    p = filterlayer(player, "NAME_$(plevel)", pname, iszero(plevel))
+    isempty(p) && throw(ArgumentError("could not find required region"))
 
-    !children && return parent
+    !children && return p
 
-    children_level = parent_level + 1
-    children_level == nlayers && return (parent, Tables.rowtable([]))
-    children_layer = getlayer(data, children_level)
-    children = filterlayer(children_layer, "NAME_$(parent_level)", parent_name, iszero(parent_level))
+    # c -> children, is the region 1 level lower than p
+    clevel = plevel + 1
+    clevel == nlayers && return (p, Tables.rowtable([]))
+    clayer = getlayer(data, clevel)
+    c = filterlayer(clayer, "NAME_$(plevel)", pname, iszero(plevel))
 
-    return parent, children
+    return p, c
 end
 
 """
