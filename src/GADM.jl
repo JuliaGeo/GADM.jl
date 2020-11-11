@@ -14,6 +14,8 @@ code examples are "IND", "USA", "BRA".
 """
 isvalidcode(str) = match(r"\b[A-Z]{3}\b", str) !== nothing
 
+prefixgadm(country) = "GADM_$country"
+
 """
     download(country) 
 
@@ -23,15 +25,15 @@ function download(country)
     try
         # if data is already on disk
         # we just return the path
-        @datadep_str country
+        @datadep_str prefixgadm(country)
     catch KeyError
         # otherwise we register the data
         # and download using DataDeps.jl
-        register(DataDep(country,
+        register(DataDep(prefixgadm(country),
             "Geographic data for country $country provided by the https://gadm.org project.",
             "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_$(country)_gpkg.zip",
             post_fetch_method=DataDeps.unpack))
-        @datadep_str country
+        @datadep_str prefixgadm(country)
     end
 end
 
