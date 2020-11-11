@@ -36,23 +36,28 @@ end
     @test_throws ArgumentError GADM.get("ind")    
     @test_throws ArgumentError GADM.get("")   
     @test_throws ArgumentError GADM.get("IND4")   
-
-    # valid country codes
-    polygon = GADM.get("IND")
-    @test GeoInterface.geotype(polygon) == :MultiPolygon
-
-    polygon = GADM.get("IND", "Uttar Pradesh")
-    @test GeoInterface.geotype(polygon) == :MultiPolygon
-
+    # valid country codes, children=false
+    parent = GADM.get("IND")
+    @test parent isa NamedTuple
+    @test GeoInterface.geotype(parent.geom[1]) == :MultiPolygon
+    # valid country code, children=true
+    parent, children = GADM.get("IND";children=true)
+    @test parent isa NamedTuple
+    @test children isa NamedTuple
+    @test GeoInterface.geotype(parent.geom[1]) == :MultiPolygon
+    @test length(children) == 11 #number of fields in named tuple
+    geometries = Tables.getcolumn(children, Symbol("geom"))
+    @test geometries isa Array{ArchGDAL.IGeometry,1}
+    @test length(geometries) == 36 # number of rows
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
+    # throws argument error for supplying deeper region than available in dataset
+    @test_throws ArgumentError GADM.get("VAT", "Pope")
 end
 
 @testset "basic" begin
-    geom = GADM.get("VAT")
-
-    bounds = ArchGDAL.envelope(geom)
-
+    polygon = GADM.get("VAT")
+    bounds = ArchGDAL.envelope(polygon.geom[1])
     bounds_arr = [bounds.MinX, bounds.MaxX, bounds.MinY, bounds.MaxY]
 
     # Vatican City bounding boxes lat min 41.9002044 lat max 41.9073912 lon min 12.4457442 lon max 12.4583653
@@ -73,31 +78,8 @@ end
     @test_throws ArgumentError GADM.coordinates("IND4") 
     # Polygon
     c = GADM.coordinates("VAT")
-    @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
+    @test c isa Array{Array{Array{Float64,1},1},1}
     # MultiPolygon
     c = GADM.coordinates("IND", "Gujarat")
     @test c isa Array{Array{Array{Array{Float64,1},1},1},1}
-end
-
-@testset "table" begin
-    # invalid country code: lowercase
-    @test_throws ArgumentError GADM.table("ind")    
-    # empty country code
-    @test_throws ArgumentError GADM.table("")   
-    # invalid code other than format [A-Z]{3}
-    @test_throws ArgumentError GADM.table("IND4") 
-    # invalid region name
-    @test_throws ArgumentError GADM.table("IND", "New York")
-    # more subregions provided than that in database
-    @test_throws ArgumentError GADM.table("VAT", "Pope")
-    # only parent
-    parent, children = GADM.table("IND", "Uttar Pradesh", "Lucknow", "Lucknow")
-    @test parent isa NamedTuple
-    @test children isa Array
-    @test isempty(children)
-    # parent and children
-    parent, children = GADM.table("IND", "Uttar Pradesh", "Lucknow")
-    @test parent isa NamedTuple
-    @test children isa Array
-    @test length(children) == 3 # 3 regions in district Lucknow
 end
