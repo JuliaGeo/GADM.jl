@@ -21,7 +21,7 @@ isvalidcode(str) = match(r"\b[A-Z]{3}\b", str) !== nothing
 Downloads data for `country` using DataDeps.jl and returns path.
 """
 function download(country)
-    ID="GADM_$country"
+    ID = "GADM_$country"
     try
         # if data is already on disk
         # we just return the path
@@ -80,7 +80,7 @@ function getlayer(data, level)
 end
 
 """
-    get(country, subregions...;children=false)
+    get(country, subregions...; children=false)
 Returns a Tables.jl columntable for the requested region
 Geometry of the region(s) can be accessed with the key `geom`
 The geometries are GeoInterface compliant Polygons/MultiPolygons.
@@ -94,12 +94,13 @@ second return parameter are the states/provinces.
 ## Examples  
   
 ```julia
-data = get("IND") # columntable of size 1, data of India's borders
-parent, children = get("IND", "Uttar Pradesh";children=true)
+# columntable of size 1, data of India's borders
+data = get("IND")
 # parent -> state data, children -> table of all districts inside Uttar Pradesh
+parent, children = get("IND", "Uttar Pradesh"; children=true)
 ```
 """
-function get(country, subregions...;children=false)
+function get(country, subregions...; children=false)
     data = getdataset(country)
     nlayers = ArchGDAL.nlayer(data)
 
