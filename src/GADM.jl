@@ -79,6 +79,26 @@ function getlayer(data, level)
     throw(ArgumentError("asked for level $(level), valid levels are 0-$(nlayers - 1)"))
 end
 
+"""
+    get(country, subregions...;children=false)
+Returns a Tables.jl columntable for the requested region
+Geometry of the region(s) can be accessed with the key `geom`
+The geometries are GeoInterface compliant Polygons/MultiPolygons.
+
+1. country: ISO 3166 Alpha 3 country code  
+2. subregions: Full official names in hierarchial order (provinces, districts, etc.)  
+3. children: When true, function returns two columntables -> parent, children.  
+Eg. when children is set true when querying just the country,
+second return parameter are the states/provinces.  
+
+## Examples  
+  
+```julia
+data = get("IND") # columntable of size 1, data of India's borders
+parent, children = get("IND", "Uttar Pradesh";children=true)
+# parent -> state data, children -> table of all districts inside Uttar Pradesh
+```
+"""
 function get(country, subregions...;children=false)
     data = getdataset(country)
     nlayers = ArchGDAL.nlayer(data)
@@ -121,11 +141,17 @@ Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivi
 ## Example:
   
 ```julia
-julia> coordinates("VAT") # Returns a deep array of Vatican city
+c = coordinates("VAT") # Returns a deep array of Vatican city
 
-1-element Array{Array{Array{Array{Float64,1},1},1},1}:
- [[[12.455550193786678, 41.90755081176758], ..., [12.454191207885799, 41.90721130371094], [12.455550193786678, 41.90755081176758]]]
-```
+1-element Array{Array{Array{Float64,1},1},1}:
+ [[12.455550193786678, 41.90755081176758], ..., [12.454191207885799, 41.90721130371094], [12.455550193786678, 41.90755081176758]]
+
+c = coordinates("IND") # returns an array of coordinates of India's boundary
+
+763-element Array{Array{Array{Array{Float64,1},1},1},1}:
+ [[[93.78772736, 6.85264015], [93.7884903, 6.85257101], ...]]
+
+ ```
 """
 function coordinates(country, subregions...)
     p = get(country, subregions...)
