@@ -11,7 +11,9 @@
   </a>
 </p>
 
-This package provides maps and spatial data for all countries and their sub-divisions from the [GADM dataset](https://gadm.org/). It fetches the data dynamically from the officially hosted database and provides a minimal wrapper API to get boundary data of your required region.
+This package provides polygons/multipolygons for all countries and their sub-divisions from the [GADM dataset](https://gadm.org/).
+It fetches the data dynamically from the officially hosted database using [DataDeps.jl](https://github.com/oxinabox/DataDeps.jl)
+and provides a minimal wrapper API to get the coordinates of the requested geometries.
 
 ## Installation
 
@@ -23,8 +25,9 @@ Get the latest stable release with Julia's package manager:
 
 ## Usage
 
-Given the country name and official full names of subdivisions, `get` function will  
-return polygons/multipolygons which satisfy the interfaces of [GeoInterface](https://github.com/JuliaGeo/GeoInterface.jl).
+### GADM.get
+
+`GADM.get` returns polygons/multipolygons, which implement the [GeoInterface](https://github.com/JuliaGeo/GeoInterface.jl):
 
 ```julia
 import GADM
@@ -32,19 +35,82 @@ import GADM
 # GADM.get(<country>, <province/state>, <district>, <city>, ...)
 
 # get boundary of the country India
-bm = GADM.get("IND")
+india = GADM.get("IND")
 
 # get boundary of the state/province Uttar Pradesh in  India
-bm = GADM.get("IND", "Uttar Pradesh")
+uttar = GADM.get("IND", "Uttar Pradesh")
 
 # get boundary of the district Lucknow in Uttar Pradesh, India
-bm = GADM.get("IND", "Uttar Pradesh", "Lucknow")
+lucknow = GADM.get("IND", "Uttar Pradesh", "Lucknow")
 ```
-- **Country Code** follows the ISO 3166 Alpha 3 standard, you can find the code for your country [here](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3).  
-- Other parameters require full official names.
 
+The keyword `children=true` can be used to return a table of polygons for all subregions according to
+the [Tables.jl](https://github.com/JuliaData/Tables.jl) interface:
+
+```julia
+using PrettyTables
+
+brazil, states = GADM.get("BRA", children=true)
+
+pretty_table(states)
+┌────────┬────────┬──────────┬─────────────────────┬──────────────────────┬───────────┬──────────────────┬──────────
+│  GID_0 │ NAME_0 │    GID_1 │              NAME_1 │            VARNAME_1 │ NL_NAME_1 │           TYPE_1 │         ⋯
+│ String │ String │   String │              String │               String │    String │           String │         ⋯
+├────────┼────────┼──────────┼─────────────────────┼──────────────────────┼───────────┼──────────────────┼──────────
+│    BRA │ Brazil │  BRA.1_1 │                Acre │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │  BRA.2_1 │             Alagoas │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │  BRA.3_1 │               Amapá │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │  BRA.4_1 │            Amazonas │              Amazone │           │           Estado │         ⋯
+│    BRA │ Brazil │  BRA.5_1 │               Bahia │                 Ba¡a │           │           Estado │         ⋯
+│    BRA │ Brazil │  BRA.6_1 │               Ceará │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │  BRA.7_1 │    Distrito Federal │                      │           │ Distrito Federal │ Federal ⋯
+│    BRA │ Brazil │  BRA.8_1 │      Espírito Santo │       Espiritu Santo │           │           Estado │         ⋯
+│    BRA │ Brazil │  BRA.9_1 │               Goiás │          Goiáz|Goyáz │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.10_1 │            Maranhão │ São Luíz de Maranhão │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.12_1 │         Mato Grosso │         Matto Grosso │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.11_1 │  Mato Grosso do Sul │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.13_1 │        Minas Gerais │   Minas|Minas Geraes │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.14_1 │                Pará │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.15_1 │             Paraíba │             Parahyba │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.16_1 │              Paraná │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.17_1 │          Pernambuco │           Pernambouc │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.18_1 │               Piauí │               Piauhy │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.19_1 │      Rio de Janeiro │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.20_1 │ Rio Grande do Norte │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.21_1 │   Rio Grande do Sul │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.22_1 │            Rondônia │              Guaporé │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.23_1 │             Roraima │           Rio Branco │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.24_1 │      Santa Catarina │      Santa Catharina │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.25_1 │           São Paulo │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.26_1 │             Sergipe │                      │           │           Estado │         ⋯
+│    BRA │ Brazil │ BRA.27_1 │           Tocantins │                      │           │           Estado │         ⋯
+└────────┴────────┴──────────┴─────────────────────┴──────────────────────┴───────────┴──────────────────┴──────────
+                                                                                                   4 columns omitted
+```
+
+- **Country Code** follows the ISO 3166 Alpha 3 standard, you can find the code for your country [here](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3).  
+- Other regions require "approximately" official names that are at least contained (case-insensitive) in the official name.
+
+### GADM.coordinates
+
+`GADM.coordinates` returns the coordinates of a region as a `Vector{Vector{Vector{Vector{Float64}}}}` (i.e. a MultiPolygon)
+extracted with the `GeoInterface`. This convenience function exists for users who are only interested in the geometry of the
+region, and do not want to depend on a separate package to query the coordinates.
+
+```julia
+GADM.coordinates("BRA", "Rio")
+173-element Array{Array{Array{Array{Float64,1},1},1},1}:
+ [[[-44.67124939, -23.35458374], [-44.67124939, -23.35486031], [-44.67097092, -23.35486031], [-44.67097092, -23.35513878], [-44.67069626, -23.35513878], [-44.67069626, -23.35569382], [-44.67097092, -23.35569382], [-44.67097092, -23.35597229], [-44.67124939, -23.35597229], [-44.67124939, -23.35625076]  …  [-44.67208481, -23.35708427], [-44.67263794, -23.35708427], [-44.67263794, -23.35680771], [-44.67291641, -23.35680771], [-44.67291641, -23.35513878], [-44.67263794, -23.35513878], [-44.67263794, -23.35486031], [-44.67235947, -23.35486031], [-44.67235947, -23.35458374], [-44.67124939, -23.35458374]]]
+ [[[-44.56708145, -23.34763908], [-44.56708145, -23.34791756], [-44.56680679, -23.34791756], [-44.56680679, -23.34874916], [-44.56708145, -23.34874916], [-44.56708145, -23.34902763], [-44.56735992, -23.34902763], [-44.56735992, -23.34958267], [-44.5676384, -23.34958267], [-44.5676384, -23.35013962]  …  [-44.5704155, -23.35041618], [-44.57013702, -23.35041618], [-44.57013702, -23.3484726], [-44.56986237, -23.3484726], [-44.56986237, -23.34819412], [-44.56958389, -23.34819412], [-44.56958389, -23.34791756], [-44.56930542, -23.34791756], [-44.56930542, -23.34763908], [-44.56708145, -23.34763908]]]
+ ...
+ ...
+ ...
+```
+
+- The coordinate reference system is longitude/latitude and the WGS84 datum.
 
 ## Credits
 
 GADM, the Database of Global Administrative Areas, is a high-resolution database of country administrative areas, with a goal of "all countries, at all levels, at any time period." The database is available in a few export formats, including shapefiles that are used in most common GIS applications.
 
+Please read their license at https://gadm.org/license.html which is different than the MIT license of the GADM.jl package.
