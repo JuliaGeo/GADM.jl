@@ -47,7 +47,6 @@ end
     @test GeoInterface.geotype(parent.geom[1]) == :MultiPolygon
     @test length(children) == 11 #number of fields in named tuple
     geometries = Tables.getcolumn(children, Symbol("geom"))
-    @test geometries isa Array{ArchGDAL.IGeometry,1}
     @test length(geometries) == 36 # number of rows
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")

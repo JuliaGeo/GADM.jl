@@ -105,10 +105,10 @@ function get(country, subregions...; children=false)
     nlayers = ArchGDAL.nlayer(data)
 
     function filterlayer(layer, key, value, all=false)
-        table = ArchGDAL.Table(layer)
         filtered = []
-        for row in Tables.rows(table)
-            field = row[Symbol(key)]
+        for row in layer
+            fieldindex = ArchGDAL.findfieldindex(row, Symbol(key))
+            field = ArchGDAL.getfield(row, fieldindex)
             if all || occursin(lowercase(value), lowercase(field))
                 push!(filtered, row)
             end
