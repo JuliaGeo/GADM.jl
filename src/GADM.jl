@@ -6,6 +6,12 @@ using Logging
 using Tables
 using GeoInterface
 
+function __init__()
+    # make sure geometries are always downloaded
+    # without user interaction from DataDeps.jl
+    ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+end
+
 """
     isvalidcode(str)
 
@@ -16,7 +22,7 @@ code examples are "IND", "USA", "BRA".
 isvalidcode(str) = match(r"\b[A-Z]{3}\b", str) !== nothing
 
 """
-    download(country) 
+    download(country)
 
 Downloads data for `country` using DataDeps.jl and returns path.
 """
@@ -64,7 +70,7 @@ function getdataset(country)
 end
 
 """
-    getlayer(data, level) 
+    getlayer(data, level)
 
 Get layer of the desired `level` from the `data`.
 """
@@ -85,14 +91,14 @@ Returns a Tables.jl columntable for the requested region
 Geometry of the region(s) can be accessed with the key `geom`
 The geometries are GeoInterface compliant Polygons/MultiPolygons.
 
-1. country: ISO 3166 Alpha 3 country code  
-2. subregions: Full official names in hierarchial order (provinces, districts, etc.)  
-3. children: When true, function returns two columntables -> parent, children.  
+1. country: ISO 3166 Alpha 3 country code
+2. subregions: Full official names in hierarchial order (provinces, districts, etc.)
+3. children: When true, function returns two columntables -> parent, children.
 Eg. when children is set true when querying just the country,
-second return parameter are the states/provinces.  
+second return parameter are the states/provinces.
 
-## Examples  
-  
+## Examples
+
 ```julia
 # columntable of size 1, data of India's borders
 data = get("IND")
@@ -118,7 +124,7 @@ function get(country, subregions...; children=false)
 
     # p -> parent, is the requested region
     plevel = length(subregions)
-    plevel >= nlayers && throw(ArgumentError("more subregions provided than actual")) 
+    plevel >= nlayers && throw(ArgumentError("more subregions provided than actual"))
     pname = isempty(subregions) ? "" : last(subregions)
     player = getlayer(data, plevel)
     p = filterlayer(player, "NAME_$(plevel)", pname, iszero(plevel))
@@ -136,13 +142,13 @@ function get(country, subregions...; children=false)
 end
 
 """
-    coordinates(country, subregions...)  
+    coordinates(country, subregions...)
 
-Returns a deep array of coordinates for the requested region.  
-Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions  
+Returns a deep array of coordinates for the requested region.
+Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions
 
 ## Example:
-  
+
 ```julia
 c = coordinates("VAT") # Returns a deep array of Vatican city
 
