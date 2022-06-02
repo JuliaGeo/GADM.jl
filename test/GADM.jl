@@ -39,12 +39,12 @@ end
     # valid country codes, children=false
     parent = GADM.get("IND")
     @test parent isa NamedTuple
-    @test GeoInterface.geotype(parent.geom[1]) == :MultiPolygon
+    @test GeoInterface.geomtrait(parent.geom[1]) isa MultiPolygonTrait
     # valid country code, children=true
     parent, children = GADM.get("IND";children=true)
     @test parent isa NamedTuple
     @test children isa NamedTuple
-    @test GeoInterface.geotype(parent.geom[1]) == :MultiPolygon
+    @test GeoInterface.mtrait(parent.geom[1]) isa MultiPolygonTrait
     @test length(children) == 11 #number of fields in named tuple
     geometries = Tables.getcolumn(children, Symbol("geom"))
     @test length(geometries) == 36 # number of rows
