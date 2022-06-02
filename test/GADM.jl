@@ -44,7 +44,7 @@ end
     parent, children = GADM.get("IND";children=true)
     @test parent isa NamedTuple
     @test children isa NamedTuple
-    @test GeoInterface.mtrait(parent.geom[1]) isa MultiPolygonTrait
+    @test GeoInterface.geomtrait(parent.geom[1]) isa MultiPolygonTrait
     @test length(children) == 11 #number of fields in named tuple
     geometries = Tables.getcolumn(children, Symbol("geom"))
     @test length(geometries) == 36 # number of rows
