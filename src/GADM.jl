@@ -141,30 +141,4 @@ function get(country, subregions...; children=false)
     return p, c
 end
 
-"""
-    coordinates(country, subregions...)
-
-Returns a deep array of coordinates for the requested region.
-Input: ISO 3166 Alpha 3 Country Code, and further full official names of subdivisions
-
-## Example:
-
-```julia
-c = coordinates("VAT") # Returns a deep array of Vatican city
-
-1-element Array{Array{Array{Float64,1},1},1}:
- [[12.455550193786678, 41.90755081176758], ..., [12.454191207885799, 41.90721130371094], [12.455550193786678, 41.90755081176758]]
-
-c = coordinates("IND") # returns an array of coordinates of India's boundary
-
-763-element Array{Array{Array{Array{Float64,1},1},1},1}:
- [[[93.78772736, 6.85264015], [93.7884903, 6.85257101], ...]]
-
- ```
-"""
-function coordinates(country, subregions...)
-    p = get(country, subregions...)
-    GeoInterface.coordinates(p.geom[1])
-end
-
 end

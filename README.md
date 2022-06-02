@@ -25,8 +25,6 @@ Get the latest stable release with Julia's package manager:
 
 ## Usage
 
-### GADM.get
-
 `GADM.get` returns polygons/multipolygons, which implement the [GeoInterface](https://github.com/JuliaGeo/GeoInterface.jl):
 
 ```julia
@@ -91,23 +89,7 @@ pretty_table(states)
 - **Country Code** follows the ISO 3166 Alpha 3 standard, you can find the code for your country [here](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3).  
 - Other regions require "approximately" official names that are at least contained (case-insensitive) in the official name.
 
-### GADM.coordinates
-
-`GADM.coordinates` returns the coordinates of a region as a `Vector{Vector{Vector{Vector{Float64}}}}` (i.e. a MultiPolygon)
-extracted with the `GeoInterface`. This convenience function exists for users who are only interested in the geometry of the
-region, and do not want to depend on a separate package to query the coordinates.
-
-```julia
-GADM.coordinates("BRA", "Rio")
-173-element Array{Array{Array{Array{Float64,1},1},1},1}:
- [[[-44.67124939, -23.35458374], [-44.67124939, -23.35486031], [-44.67097092, -23.35486031], [-44.67097092, -23.35513878], [-44.67069626, -23.35513878], [-44.67069626, -23.35569382], [-44.67097092, -23.35569382], [-44.67097092, -23.35597229], [-44.67124939, -23.35597229], [-44.67124939, -23.35625076]  …  [-44.67208481, -23.35708427], [-44.67263794, -23.35708427], [-44.67263794, -23.35680771], [-44.67291641, -23.35680771], [-44.67291641, -23.35513878], [-44.67263794, -23.35513878], [-44.67263794, -23.35486031], [-44.67235947, -23.35486031], [-44.67235947, -23.35458374], [-44.67124939, -23.35458374]]]
- [[[-44.56708145, -23.34763908], [-44.56708145, -23.34791756], [-44.56680679, -23.34791756], [-44.56680679, -23.34874916], [-44.56708145, -23.34874916], [-44.56708145, -23.34902763], [-44.56735992, -23.34902763], [-44.56735992, -23.34958267], [-44.5676384, -23.34958267], [-44.5676384, -23.35013962]  …  [-44.5704155, -23.35041618], [-44.57013702, -23.35041618], [-44.57013702, -23.3484726], [-44.56986237, -23.3484726], [-44.56986237, -23.34819412], [-44.56958389, -23.34819412], [-44.56958389, -23.34791756], [-44.56930542, -23.34791756], [-44.56930542, -23.34763908], [-44.56708145, -23.34763908]]]
- ...
- ...
- ...
-```
-
-- The coordinate reference system is longitude/latitude and the WGS84 datum.
+The coordinate reference system is longitude/latitude and the WGS84 datum.
 
 ## Credits
 
