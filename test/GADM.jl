@@ -53,11 +53,11 @@ end
     # throws argument error for supplying deeper region than available in dataset
     @test_throws ArgumentError GADM.get("VAT", "Pope")
 
-    # level tests
-    level0 = GADM.get("IND", level=0)
-    level1 = GADM.get("IND", level=1)
-    level2 = GADM.get("IND", level=2)
-    level3 = GADM.get("IND", level=3)
+    # depth tests
+    level0 = GADM.get("IND", depth=0)
+    level1 = GADM.get("IND", depth=1)
+    level2 = GADM.get("IND", depth=2)
+    level3 = GADM.get("IND", depth=3)
     @test length(Tables.getcolumn(level0, :geom)) == 1
     @test length(Tables.getcolumn(level1, :geom)) == 36
     @test length(Tables.getcolumn(level2, :geom)) == 666
@@ -67,10 +67,7 @@ end
     @test issubset(somecities, level2.NAME_2)
 
     # throws argument error when the level is deeper than available in dataset
-    @test_throws ArgumentError GADM.get("IND", level=4)
-    # throws argument error when the subregions are deeper then the required level
-    @test_throws ArgumentError GADM.get("IND", "Karnataka", "Bangalore", level=1)
-
+    @test_throws ArgumentError GADM.get("IND", depth=4)
 end
 
 @testset "basic" begin

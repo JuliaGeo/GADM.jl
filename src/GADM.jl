@@ -106,24 +106,21 @@ data = get("IND")
 parent, children = get("IND", "Uttar Pradesh"; children=true)
 ```
 """
-function get(country, subregions...; level=length(subregions), children=false)
+function get(country, subregions...; depth=0, children=false)
     # par -> parent, is the requested region
-    par = _get(country, level, subregions...)
+    par = _get(country, depth, subregions...)
     if children
         # chil -> children, is the region 1 level lower than par
-        chil = _get(country, level+1, subregions...)
+        chil = _get(country, depth+1, subregions...)
         return par, chil
     else
         return par
     end
 end
 
-function _get(country, level, subregions...)
-    level < length(subregions) && throw(ArgumentError("less levels required than subregions"))
-
+function _get(country, depth, subregions...)
     data = getdataset(country)
     nlayers = ArchGDAL.nlayer(data)
-    level > nlayers && throw(ArgumentError("more levels required than actual"))
 
     function filterlayer(layer, key, value, all=false)
         filtered = []
@@ -142,8 +139,10 @@ function _get(country, level, subregions...)
     qlevel = length(subregions)
     qlevel >= nlayers && throw(ArgumentError("more subregions provided than actual"))
 
-    # select layer by level and subregions
+    # select layer by level
+    level = length(subregions) + depth
     slayer = getlayer(data, level)
+    # filter layer by subregions 
     slayer = filterlayer(slayer, "NAME_$(qlevel)", qname, iszero(qlevel))
     isempty(slayer) && throw(ArgumentError("could not find required region"))
 
