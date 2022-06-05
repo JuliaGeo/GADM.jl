@@ -106,9 +106,24 @@ data = get("IND")
 parent, children = get("IND", "Uttar Pradesh"; children=true)
 ```
 """
-function get(country, subregions...; children=false)
+function get(country, subregions...; level=length(subregions), children=false)
+    # par -> parent, is the requested region
+    par = _get(country, level, subregions...)
+    if children
+        # chil -> children, is the region 1 level lower than par
+        chil = _get(country, level+1, subregions...)
+        return par, chil
+    else
+        return par
+    end
+end
+
+function _get(country, level, subregions...)
+    level < length(subregions) && throw(ArgumentError("less levels required than subregions"))
+
     data = getdataset(country)
     nlayers = ArchGDAL.nlayer(data)
+    level > nlayers && throw(ArgumentError("more levels required than actual"))
 
     function filterlayer(layer, key, value, all=false)
         filtered = []
@@ -122,23 +137,17 @@ function get(country, subregions...; children=false)
         return Tables.columntable(filtered)
     end
 
-    # p -> parent, is the requested region
-    plevel = length(subregions)
-    plevel >= nlayers && throw(ArgumentError("more subregions provided than actual"))
-    pname = isempty(subregions) ? "" : last(subregions)
-    player = getlayer(data, plevel)
-    p = filterlayer(player, "NAME_$(plevel)", pname, iszero(plevel))
-    isempty(p) && throw(ArgumentError("could not find required region"))
+    # fetch query params
+    qname = isempty(subregions) ? "" : last(subregions)
+    qlevel = length(subregions)
+    qlevel >= nlayers && throw(ArgumentError("more subregions provided than actual"))
 
-    !children && return p
+    # select layer by level and subregions
+    slayer = getlayer(data, level)
+    slayer = filterlayer(slayer, "NAME_$(qlevel)", qname, iszero(qlevel))
+    isempty(slayer) && throw(ArgumentError("could not find required region"))
 
-    # c -> children, is the region 1 level lower than p
-    clevel = plevel + 1
-    clevel == nlayers && return (p, Tables.rowtable([]))
-    clayer = getlayer(data, clevel)
-    c = filterlayer(clayer, "NAME_$(plevel)", pname, iszero(plevel))
-
-    return p, c
+    slayer
 end
 
 end
