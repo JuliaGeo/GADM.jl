@@ -106,19 +106,7 @@ data = get("IND")
 parent, children = get("IND", "Uttar Pradesh"; children=true)
 ```
 """
-function get(country, subregions...; depth=0, children=false)
-    # par -> parent, is the requested region
-    par = _get(country, depth, subregions...)
-    if children
-        # chil -> children, is the region 1 level lower than par
-        chil = _get(country, depth+1, subregions...)
-        return par, chil
-    else
-        return par
-    end
-end
-
-function _get(country, depth, subregions...)
+function get(country, subregions...; depth=0)
     data = getdataset(country)
     nlayers = ArchGDAL.nlayer(data)
 

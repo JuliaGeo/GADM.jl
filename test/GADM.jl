@@ -36,17 +36,17 @@ end
     @test_throws ArgumentError GADM.get("ind")    
     @test_throws ArgumentError GADM.get("")   
     @test_throws ArgumentError GADM.get("IND4")   
-    # valid country codes, children=false
-    parent = GADM.get("IND")
-    @test parent isa NamedTuple
-    @test GeoInterface.geomtrait(parent.geom[1]) isa MultiPolygonTrait
-    # valid country code, children=true
-    parent, children = GADM.get("IND";children=true)
-    @test parent isa NamedTuple
-    @test children isa NamedTuple
-    @test GeoInterface.geomtrait(parent.geom[1]) isa MultiPolygonTrait
-    @test length(children) == 11 #number of fields in named tuple
-    geometries = Tables.getcolumn(children, Symbol("geom"))
+    # valid country code
+    country = GADM.get("IND")
+    @test country isa NamedTuple
+    @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
+    # get country and states
+    country, states = GADM.get("IND";depth=0), GADM.get("IND", depth=1)
+    @test country isa NamedTuple
+    @test states isa NamedTuple
+    @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
+    @test length(states) == 11 #number of fields in named tuple
+    geometries = Tables.getcolumn(states, Symbol("geom"))
     @test length(geometries) == 36 # number of rows
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
