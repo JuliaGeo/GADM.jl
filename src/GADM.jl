@@ -130,6 +130,7 @@ function get(country, subregions...; depth=0)
     # select layer by level
     level = length(subregions) + depth
     slayer = getlayer(data, level)
+    
     # filter layer by subregions 
     slayer = filterlayer(slayer, "NAME_$(qlevel)", qname, iszero(qlevel))
     isempty(slayer) && throw(ArgumentError("could not find required region"))

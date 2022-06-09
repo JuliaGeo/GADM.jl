@@ -36,20 +36,24 @@ end
     @test_throws ArgumentError GADM.get("ind")    
     @test_throws ArgumentError GADM.get("")   
     @test_throws ArgumentError GADM.get("IND4")   
+
     # valid country code
     country = GADM.get("IND")
-    @test country isa NamedTuple
+    @test Tables.istable(country)
     @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
+
     # get country and states
     country, states = GADM.get("IND";depth=0), GADM.get("IND", depth=1)
-    @test country isa NamedTuple
-    @test states isa NamedTuple
+    @test Tables.istable(country)
+    @test Tables.istable(states)
     @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
-    @test length(states) == 11 #number of fields in named tuple
+    @test length(states) == 11 # number of fields in table
     geometries = Tables.getcolumn(states, Symbol("geom"))
     @test length(geometries) == 36 # number of rows
+
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
+
     # throws argument error for supplying deeper region than available in dataset
     @test_throws ArgumentError GADM.get("VAT", "Pope")
 
