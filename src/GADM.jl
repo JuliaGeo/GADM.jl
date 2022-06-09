@@ -125,7 +125,7 @@ function get(country, subregions...; depth=0)
     # fetch query params
     qname = isempty(subregions) ? "" : last(subregions)
     qlevel = length(subregions)
-    qlevel >= nlayers && throw(ArgumentError("more subregions provided than actual"))
+    qlevel ≥ nlayers && throw(ArgumentError("more subregions provided than actual"))
 
     # select layer by level
     level = length(subregions) + depth
