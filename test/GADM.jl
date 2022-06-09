@@ -36,22 +36,42 @@ end
     @test_throws ArgumentError GADM.get("ind")    
     @test_throws ArgumentError GADM.get("")   
     @test_throws ArgumentError GADM.get("IND4")   
-    # valid country codes, children=false
-    parent = GADM.get("IND")
-    @test parent isa NamedTuple
-    @test GeoInterface.geomtrait(parent.geom[1]) isa MultiPolygonTrait
-    # valid country code, children=true
-    parent, children = GADM.get("IND";children=true)
-    @test parent isa NamedTuple
-    @test children isa NamedTuple
-    @test GeoInterface.geomtrait(parent.geom[1]) isa MultiPolygonTrait
-    @test length(children) == 11 #number of fields in named tuple
-    geometries = Tables.getcolumn(children, Symbol("geom"))
+
+    # valid country code
+    country = GADM.get("IND")
+    @test Tables.istable(country)
+    @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
+
+    # get country and states
+    country, states = GADM.get("IND";depth=0), GADM.get("IND", depth=1)
+    @test Tables.istable(country)
+    @test Tables.istable(states)
+    @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
+    @test length(states) == 11 # number of fields in table
+    geometries = Tables.getcolumn(states, Symbol("geom"))
     @test length(geometries) == 36 # number of rows
+
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
+
     # throws argument error for supplying deeper region than available in dataset
     @test_throws ArgumentError GADM.get("VAT", "Pope")
+
+    # depth tests
+    level0 = GADM.get("IND", depth=0)
+    level1 = GADM.get("IND", depth=1)
+    level2 = GADM.get("IND", depth=2)
+    level3 = GADM.get("IND", depth=3)
+    @test length(Tables.getcolumn(level0, :geom)) == 1
+    @test length(Tables.getcolumn(level1, :geom)) == 36
+    @test length(Tables.getcolumn(level2, :geom)) == 666
+    @test length(Tables.getcolumn(level3, :geom)) == 2340
+    
+    somecities = ["Mumbai City", "Bangalore", "Chennai"]
+    @test issubset(somecities, level2.NAME_2)
+
+    # throws argument error when the level is deeper than available in dataset
+    @test_throws ArgumentError GADM.get("IND", depth=4)
 end
 
 @testset "basic" begin

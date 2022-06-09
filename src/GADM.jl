@@ -86,27 +86,27 @@ function getlayer(data, level)
 end
 
 """
-    get(country, subregions...; children=false)
+    get(country, subregions...; depth=0)
 Returns a Tables.jl columntable for the requested region
 Geometry of the region(s) can be accessed with the key `geom`
 The geometries are GeoInterface compliant Polygons/MultiPolygons.
 
 1. country: ISO 3166 Alpha 3 country code
 2. subregions: Full official names in hierarchial order (provinces, districts, etc.)
-3. children: When true, function returns two columntables -> parent, children.
-Eg. when children is set true when querying just the country,
-second return parameter are the states/provinces.
+3. depth: Number of levels below the last subregion to search, default = 0
 
 ## Examples
 
 ```julia
 # columntable of size 1, data of India's borders
 data = get("IND")
-# parent -> state data, children -> table of all districts inside Uttar Pradesh
-parent, children = get("IND", "Uttar Pradesh"; children=true)
+# columntable of all states and union territories inside India
+data = get("IND"; depth=1)
+# columntable of all districts inside Uttar Pradesh
+data = get("IND", "Uttar Pradesh"; depth=1)
 ```
 """
-function get(country, subregions...; children=false)
+function get(country, subregions...; depth=0)
     data = getdataset(country)
     nlayers = ArchGDAL.nlayer(data)
 
@@ -122,23 +122,20 @@ function get(country, subregions...; children=false)
         return Tables.columntable(filtered)
     end
 
-    # p -> parent, is the requested region
-    plevel = length(subregions)
-    plevel >= nlayers && throw(ArgumentError("more subregions provided than actual"))
-    pname = isempty(subregions) ? "" : last(subregions)
-    player = getlayer(data, plevel)
-    p = filterlayer(player, "NAME_$(plevel)", pname, iszero(plevel))
-    isempty(p) && throw(ArgumentError("could not find required region"))
+    # fetch query params
+    qname = isempty(subregions) ? "" : last(subregions)
+    qlevel = length(subregions)
+    qlevel ≥ nlayers && throw(ArgumentError("more subregions provided than actual"))
 
-    !children && return p
+    # select layer by level
+    level = length(subregions) + depth
+    slayer = getlayer(data, level)
+    
+    # filter layer by subregions 
+    slayer = filterlayer(slayer, "NAME_$(qlevel)", qname, iszero(qlevel))
+    isempty(slayer) && throw(ArgumentError("could not find required region"))
 
-    # c -> children, is the region 1 level lower than p
-    clevel = plevel + 1
-    clevel == nlayers && return (p, Tables.rowtable([]))
-    clayer = getlayer(data, clevel)
-    c = filterlayer(clayer, "NAME_$(plevel)", pname, iszero(plevel))
-
-    return p, c
+    slayer
 end
 
 end
