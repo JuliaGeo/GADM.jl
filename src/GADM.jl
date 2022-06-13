@@ -86,6 +86,27 @@ function getlayer(data, level)
 end
 
 """
+    filterlayer(data, qkeys, qvalues)
+
+Filter layer's rows that satisfies the query params `qkeys` and `qvalues`.
+"""
+function filterlayer(layer, qkeys, qvalues)
+    filtered = []
+    for row in layer
+        matchqueries = true
+        for (qkey, qvalue) in zip(qkeys, qvalues)
+            field = ArchGDAL.getfield(row, qkey)
+            if lowercase(field) ≠ lowercase(qvalue)
+                matchqueries = false
+                break
+            end
+        end
+        matchqueries && push!(filtered, row)
+    end
+    return Tables.columntable(filtered)
+end
+
+"""
     get(country, subregions...; depth=0)
 Returns a Tables.jl columntable for the requested region
 Geometry of the region(s) can be accessed with the key `geom`
@@ -108,31 +129,17 @@ data = get("IND", "Uttar Pradesh"; depth=1)
 """
 function get(country, subregions...; depth=0)
     data = getdataset(country)
-    nlayers = ArchGDAL.nlayer(data)
-
-    function filterlayer(layer, key, value, all=false)
-        filtered = []
-        for row in layer
-            index = ArchGDAL.findfieldindex(row, Symbol(key))
-            field = ArchGDAL.getfield(row, index)
-            if all || occursin(lowercase(value), lowercase(field))
-                push!(filtered, row)
-            end
-        end
-        return Tables.columntable(filtered)
-    end
 
     # fetch query params
-    qname = isempty(subregions) ? "" : last(subregions)
-    qlevel = length(subregions)
-    qlevel ≥ nlayers && throw(ArgumentError("more subregions provided than actual"))
-
+    qkeys = ["NAME_$(qlevel)" for qlevel in 1:length(subregions)]
+    qvalues = subregions
+    
     # select layer by level
     level = length(subregions) + depth
     slayer = getlayer(data, level)
     
     # filter layer by subregions 
-    slayer = filterlayer(slayer, "NAME_$(qlevel)", qname, iszero(qlevel))
+    slayer = filterlayer(slayer, qkeys, qvalues)
     isempty(slayer) && throw(ArgumentError("could not find required region"))
 
     slayer
