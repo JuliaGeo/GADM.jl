@@ -43,7 +43,7 @@ end
     @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
 
     # get country and states
-    country, states = GADM.get("IND";depth=0), GADM.get("IND", depth=1)
+    country, states = GADM.get("IND", depth=0), GADM.get("IND", depth=1)
     @test Tables.istable(country)
     @test Tables.istable(states)
     @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
@@ -72,6 +72,23 @@ end
 
     # throws argument error when the level is deeper than available in dataset
     @test_throws ArgumentError GADM.get("IND", depth=4)
+
+    # subregions tests
+    subregions = GADM.get("SUR", "Para", depth=1)
+    expected = ["Bigi Poika", "Carolina", "Noord", "Oost", "Zuid"]
+    @test issetequal(subregions.NAME_2, expected)
+
+    # subregions with same name
+    suriname = GADM.get("SUR", depth=2)
+    @test count(==("Welgelegen"), suriname.NAME_2) == 2
+
+    coronie = GADM.get("SUR", "Coronie", "Welgelegen")
+    paramaribo = GADM.get("SUR", "Paramaribo", "Welgelegen")
+    @test length(coronie.NAME_1) == length(paramaribo.NAME_1) == 1
+    @test coronie.NAME_1 ≠ paramaribo.NAME_1
+
+    # invalid subregion
+    @test_throws ArgumentError GADM.get("SUR", "a", "Welgelegen")
 end
 
 @testset "basic" begin
