@@ -1,7 +1,7 @@
 <p align="center">
   <img src="docs/banner.png"><br>
   <a href="https://github.com/JuliaGeo/GADM.jl/actions">
-    <img src="https://img.shields.io/github/workflow/status/JuliaGeo/GADM.jl/CI">
+    <img src="https://img.shields.io/github/actions/workflow/status/JuliaGeo/GADM.jl/CI.yml?branch=master">
   </a>
   <a href="https://codecov.io/gh/JuliaGeo/GADM.jl">
     <img src="https://codecov.io/gh/JuliaGeo/GADM.jl/branch/master/graph/badge.svg">
