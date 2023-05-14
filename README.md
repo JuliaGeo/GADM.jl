@@ -12,8 +12,7 @@
 </p>
 
 This package provides polygons/multipolygons for all countries and their sub-divisions from the [GADM dataset](https://gadm.org/).
-It fetches the data dynamically from the officially hosted database using [DataDeps.jl](https://github.com/oxinabox/DataDeps.jl)
-and provides a minimal wrapper API to get the coordinates of the requested geometries.
+It fetches the data dynamically from the officially hosted database using [DataDeps.jl](https://github.com/oxinabox/DataDeps.jl).
 
 ## Installation
 
