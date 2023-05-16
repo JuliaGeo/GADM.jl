@@ -15,12 +15,31 @@ end
     @test_nowarn @datadep_str "GADM_VAT"
     @test_nowarn @datadep_str "GADM_SUR"
     @test_nowarn @datadep_str "GADM_IND"
+
+    # invalid API version
+    @test_throws ArgumentError GADM.download("VAT", version="4.2")
 end
 
 @testset "dataread" begin
     path = GADM.download("VAT")
     data = GADM.dataread(path)
-    @test typeof(data) === ArchGDAL.IDataset
+    @test data isa ArchGDAL.IDataset
+end
+
+@testset "other API versions" begin
+    path28 = GADM.download("FRA", version="2.8")
+    path36 = GADM.download("GRC", version="3.6")
+    path40 = GADM.download("ITA", version="4.0")
+    @test_nowarn @datadep_str "GADM_FRA"
+    @test_nowarn @datadep_str "GADM_GRC"
+    @test_nowarn @datadep_str "GADM_ITA"
+
+    data28 = GADM.dataread(path28)
+    data36 = GADM.dataread(path36)
+    data40 = GADM.dataread(path40)
+    @test data28 isa ArchGDAL.IDataset
+    @test data36 isa ArchGDAL.IDataset
+    @test data40 isa ArchGDAL.IDataset
 end
 
 @testset "getlayer" begin
@@ -32,7 +51,7 @@ end
 
     # correct level
     layer = GADM.getlayer(data, 0)
-    @test typeof(layer) === ArchGDAL.IFeatureLayer
+    @test layer isa ArchGDAL.IFeatureLayer
 end
 
 @testset "get" begin
@@ -51,12 +70,12 @@ end
     @test Tables.istable(country)
     @test Tables.istable(states)
     @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
-    @test length(states) == 11 # number of fields in table
+    @test length(states) == 12 # number of fields in table
     geometries = Tables.getcolumn(states, Symbol("geom"))
-    @test length(geometries) == 36 # number of rows
+    @test length(geometries) == 41 # number of rows
 
     # throws error when query is invalid
-    @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
+    @test_throws ArgumentError GADM.get("IND", "Rio de Janeiro")
 
     # throws argument error for supplying deeper region than available in dataset
     @test_throws ArgumentError GADM.get("VAT", "Pope")
@@ -66,10 +85,10 @@ end
     level1 = GADM.get("IND", depth=1)
     level2 = GADM.get("IND", depth=2)
     level3 = GADM.get("IND", depth=3)
-    @test length(Tables.getcolumn(level0, :geom)) == 1
-    @test length(Tables.getcolumn(level1, :geom)) == 36
-    @test length(Tables.getcolumn(level2, :geom)) == 666
-    @test length(Tables.getcolumn(level3, :geom)) == 2340
+    @test length(Tables.getcolumn(level0, :geom)) == 6
+    @test length(Tables.getcolumn(level1, :geom)) == 41
+    @test length(Tables.getcolumn(level2, :geom)) == 676
+    @test length(Tables.getcolumn(level3, :geom)) == 2347
     
     somecities = ["Mumbai City", "Bangalore", "Chennai"]
     @test issubset(somecities, level2.NAME_2)

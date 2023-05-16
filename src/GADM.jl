@@ -21,24 +21,53 @@ code examples are "IND", "USA", "BRA".
 """
 isvalidcode(str) = match(r"\b[A-Z]{3}\b", str) !== nothing
 
+const API_VERSIONS = ("4.1", "4.0", "3.6", "2.8")
+
 """
-    download(country)
+    download(country; version="4.1")
 
 Downloads data for `country` using DataDeps.jl and returns path.
+The data is provided by the API of the [GADM](https://gadm.org) project.
+It is possible to choose the API version by passing it to the
+`version` keyword argument as string.
+The available API versions are: 4.1 (default), 4.0, 3.6 and 2.8.
 """
-function download(country)
+function download(country; version="4.1")
+    if version ∉ API_VERSIONS
+        throw(ArgumentError("invalid API version"))
+    end
+
+    route = if version == "2.8"
+        "https://biogeo.ucdavis.edu/data/gadm2.8/gpkg"
+    else
+        "https://geodata.ucdavis.edu/gadm/gadm$version/gpkg"
+    end
+    
+    filename = if version == "2.8"
+        "$(country)_adm_gpkg.zip"
+    elseif version == "3.6"
+        "gadm36_$(country)_gpkg.zip"
+    elseif version == "4.0"
+        "gadm40_$(country).gpkg"
+    else
+        "gadm41_$(country).gpkg"
+    end
+
     ID = "GADM_$country"
+    postfetch = version ∈ ("3.6", "2.8") ? DataDeps.unpack : identity
+
     try
         # if data is already on disk
         # we just return the path
         @datadep_str ID
-    catch KeyError
+    catch
         # otherwise we register the data
         # and download using DataDeps.jl
         register(DataDep(ID,
             "Geographic data for country $country provided by the https://gadm.org project.",
-            "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_$(country)_gpkg.zip",
-            post_fetch_method=DataDeps.unpack))
+            "$route/$filename",
+            post_fetch_method=postfetch
+        ))
         @datadep_str ID
     end
 end
@@ -60,13 +89,13 @@ function dataread(path)
 end
 
 """
-    getdataset(country)
+    getdataset(country; version="4.1")
 
 Downloads and extracts dataset of the given country code
 """
-function getdataset(country)
+function getdataset(country; kwargs...)
     isvalidcode(country) || throw(ArgumentError("please provide standard ISO 3 country codes"))
-    data = country |> download |> dataread
+    dataread(download(country; kwargs...))
 end
 
 """
@@ -107,7 +136,8 @@ function filterlayer(layer, qkeys, qvalues)
 end
 
 """
-    get(country, subregions...; depth=0)
+    get(country, subregions...; depth=0, version="4.1")
+
 Returns a Tables.jl columntable for the requested region
 Geometry of the region(s) can be accessed with the key `geom`
 The geometries are GeoInterface compliant Polygons/MultiPolygons.
@@ -127,8 +157,8 @@ data = get("IND"; depth=1)
 data = get("IND", "Uttar Pradesh"; depth=1)
 ```
 """
-function get(country, subregions...; depth=0)
-    data = getdataset(country)
+function get(country, subregions...; depth=0, kwargs...)
+    data = getdataset(country; kwargs...)
 
     # fetch query params
     qkeys = ["NAME_$(qlevel)" for qlevel in 1:length(subregions)]
