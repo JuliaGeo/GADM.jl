@@ -15,12 +15,31 @@ end
     @test_nowarn @datadep_str "GADM_VAT"
     @test_nowarn @datadep_str "GADM_SUR"
     @test_nowarn @datadep_str "GADM_IND"
+
+    # invalid API version
+    @test_throws ArgumentError GADM.download("VAT", version="4.2")
 end
 
 @testset "dataread" begin
     path = GADM.download("VAT")
     data = GADM.dataread(path)
-    @test typeof(data) === ArchGDAL.IDataset
+    @test data isa ArchGDAL.IDataset
+end
+
+@testset "other API versions" begin
+    path28 = GADM.download("FRA", version="2.8")
+    path36 = GADM.download("GRC", version="3.6")
+    path40 = GADM.download("ITA", version="4.0")
+    @test_nowarn @datadep_str "GADM_FRA"
+    @test_nowarn @datadep_str "GADM_GRC"
+    @test_nowarn @datadep_str "GADM_ITA"
+
+    data28 = GADM.dataread(path28)
+    data36 = GADM.dataread(path36)
+    data40 = GADM.dataread(path40)
+    @test data28 isa ArchGDAL.IDataset
+    @test data36 isa ArchGDAL.IDataset
+    @test data40 isa ArchGDAL.IDataset
 end
 
 @testset "getlayer" begin
@@ -32,7 +51,7 @@ end
 
     # correct level
     layer = GADM.getlayer(data, 0)
-    @test typeof(layer) === ArchGDAL.IFeatureLayer
+    @test layer isa ArchGDAL.IFeatureLayer
 end
 
 @testset "get" begin
