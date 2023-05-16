@@ -37,8 +37,7 @@ function download(country)
         # and download using DataDeps.jl
         register(DataDep(ID,
             "Geographic data for country $country provided by the https://gadm.org project.",
-            "https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_$(country)_gpkg.zip",
-            post_fetch_method=DataDeps.unpack))
+            "https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_$(country).gpkg"))
         @datadep_str ID
     end
 end
@@ -66,7 +65,7 @@ Downloads and extracts dataset of the given country code
 """
 function getdataset(country)
     isvalidcode(country) || throw(ArgumentError("please provide standard ISO 3 country codes"))
-    data = country |> download |> dataread
+    country |> download |> dataread
 end
 
 """

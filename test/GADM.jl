@@ -51,12 +51,12 @@ end
     @test Tables.istable(country)
     @test Tables.istable(states)
     @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
-    @test length(states) == 11 # number of fields in table
+    @test length(states) == 12 # number of fields in table
     geometries = Tables.getcolumn(states, Symbol("geom"))
-    @test length(geometries) == 36 # number of rows
+    @test length(geometries) == 41 # number of rows
 
     # throws error when query is invalid
-    @test_throws ArgumentError GADM.get("IND", "Rio De Janerio")
+    @test_throws ArgumentError GADM.get("IND", "Rio de Janeiro")
 
     # throws argument error for supplying deeper region than available in dataset
     @test_throws ArgumentError GADM.get("VAT", "Pope")
@@ -66,10 +66,10 @@ end
     level1 = GADM.get("IND", depth=1)
     level2 = GADM.get("IND", depth=2)
     level3 = GADM.get("IND", depth=3)
-    @test length(Tables.getcolumn(level0, :geom)) == 1
-    @test length(Tables.getcolumn(level1, :geom)) == 36
-    @test length(Tables.getcolumn(level2, :geom)) == 666
-    @test length(Tables.getcolumn(level3, :geom)) == 2340
+    @test length(Tables.getcolumn(level0, :geom)) == 6
+    @test length(Tables.getcolumn(level1, :geom)) == 41
+    @test length(Tables.getcolumn(level2, :geom)) == 676
+    @test length(Tables.getcolumn(level3, :geom)) == 2347
     
     somecities = ["Mumbai City", "Bangalore", "Chennai"]
     @test issubset(somecities, level2.NAME_2)
