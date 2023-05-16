@@ -2,9 +2,7 @@ module GADM
 
 using DataDeps
 using ArchGDAL
-using Logging
 using Tables
-using GeoInterface
 
 function __init__()
     # make sure geometries are always downloaded
