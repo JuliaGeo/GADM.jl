@@ -168,7 +168,7 @@ function get(country, subregions...; depth=0, kwargs...)
     
     # filter layer by subregions 
     slayer = filterlayer(slayer, qkeys, qvalues)
-    isempty(slayer) && throw(ArgumentError("could not find required region"))
+    isempty(slayer) && throw(ArgumentError("could not find required region (country $country, subregions $subregions)"))
 
     slayer
 end
