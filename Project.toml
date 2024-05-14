@@ -1,7 +1,7 @@
 name = "GADM"
 uuid = "a8dd9ffe-31dc-4cf5-a379-ea69100a8233"
 authors = ["Aayush Joglekar <aayushjog@gmail.com> and contributors"]
-version = "1.1.1"
+version = "1.1.2"
 
 [deps]
 ArchGDAL = "c9ce4bd3-c3d5-55b8-8973-c0e20141b8c3"
