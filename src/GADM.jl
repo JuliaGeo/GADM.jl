@@ -26,6 +26,7 @@ const API_VERSIONS = ("4.1", "4.0", "3.6", "2.8")
 
 Downloads data for `country` using DataDeps.jl and returns path.
 The data is provided by the API of the [GADM](https://gadm.org) project.
+
 It is possible to choose the API version by passing it to the
 `version` keyword argument as string.
 The available API versions are: 4.1 (default), 4.0, 3.6 and 2.8.
@@ -134,11 +135,13 @@ function filterlayer(layer, qkeys, qvalues)
 end
 
 """
-    get(country, subregions...; depth=0, version="4.1")
+    GADM.get(country, subregions...; depth=0, version="4.1")
 
-Returns a Tables.jl columntable for the requested region
-Geometry of the region(s) can be accessed with the key `geom`
-The geometries are GeoInterface compliant Polygons/MultiPolygons.
+Returns a Tables.jl columntable for the requested region.
+
+Geometry of the region(s) can be accessed with the key `geom`.
+
+The geometries are `GeoInterface`-compliant Polygons/MultiPolygons.
 
 1. country: ISO 3166 Alpha 3 country code
 2. subregions: Full official names in hierarchial order (provinces, districts, etc.)
@@ -147,12 +150,13 @@ The geometries are GeoInterface compliant Polygons/MultiPolygons.
 ## Examples
 
 ```julia
+using GADM
 # columntable of size 1, data of India's borders
-data = get("IND")
+data = GADM.get("IND")
 # columntable of all states and union territories inside India
-data = get("IND"; depth=1)
+data = GADM.get("IND"; depth=1)
 # columntable of all districts inside Uttar Pradesh
-data = get("IND", "Uttar Pradesh"; depth=1)
+data = GADM.get("IND", "Uttar Pradesh"; depth=1)
 ```
 """
 function get(country, subregions...; depth=0, kwargs...)
