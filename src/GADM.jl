@@ -1,8 +1,16 @@
+# ------------------------------------------------------------------
+# Licensed under the MIT License. See LICENSE in the project root.
+# ------------------------------------------------------------------
+
 module GADM
 
 using DataDeps
 using ArchGDAL
 using Tables
+
+import GeoInterface as GI
+
+include("table.jl")
 
 function __init__()
     # make sure geometries are always downloaded
@@ -41,7 +49,7 @@ function download(country; version="4.1")
     else
         "https://geodata.ucdavis.edu/gadm/gadm$version/gpkg"
     end
-    
+
     filename = if version == "2.8"
         "$(country)_adm_gpkg.zip"
     elseif version == "3.6"
@@ -131,7 +139,7 @@ function filterlayer(layer, qkeys, qvalues)
         end
         matchqueries && push!(filtered, row)
     end
-    return Tables.columntable(filtered)
+    return Table(filtered, GI.crs(layer))
 end
 
 """
@@ -165,14 +173,14 @@ function get(country, subregions...; depth=0, kwargs...)
     # fetch query params
     qkeys = ["NAME_$(qlevel)" for qlevel in 1:length(subregions)]
     qvalues = subregions
-    
+
     # select layer by level
     level = length(subregions) + depth
     slayer = getlayer(data, level)
-    
+
     # filter layer by subregions 
     slayer = filterlayer(slayer, qkeys, qvalues)
-    isempty(slayer) && throw(ArgumentError("could not find required region (country $country, subregions $subregions)"))
+    isempty(Tables.rows(slayer)) && throw(ArgumentError("could not find required region (country $country, subregions $subregions)"))
 
     slayer
 end
