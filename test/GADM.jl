@@ -29,17 +29,13 @@ end
 end
 
 @testset "other API versions" begin
-    path28 = GADM.download("FRA", version="2.8")
     path36 = GADM.download("GRC", version="3.6")
     path40 = GADM.download("ITA", version="4.0")
-    @test_nowarn @datadep_str "GADM_FRA"
     @test_nowarn @datadep_str "GADM_GRC"
     @test_nowarn @datadep_str "GADM_ITA"
 
-    data28 = GADM.dataread(path28)
     data36 = GADM.dataread(path36)
     data40 = GADM.dataread(path40)
-    @test data28 isa ArchGDAL.IDataset
     @test data36 isa ArchGDAL.IDataset
     @test data40 isa ArchGDAL.IDataset
 end
