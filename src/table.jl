@@ -15,4 +15,5 @@ GI.isfeaturecollection(::Type{<:Table}) = true
 GI.trait(::Table) = GI.FeatureCollectionTrait()
 GI.nfeature(::GI.FeatureCollectionTrait, table::Table) = length(table.rows)
 GI.getfeature(::GI.FeatureCollectionTrait, table::Table, i) = table.rows[i]
+GI.geometrycolumns(::Table) = (:geom,)
 GI.crs(table::Table) = table.crs

@@ -7,6 +7,7 @@ module GADM
 using DataDeps
 using ArchGDAL
 using Tables
+using HTTP
 
 import GeoInterface as GI
 
@@ -70,12 +71,20 @@ function download(country; version="4.1")
     catch
         # otherwise we register the data
         # and download using DataDeps.jl
-        register(DataDep(ID,
-            "Geographic data for country $country provided by the https://gadm.org project.",
-            "$route/$filename",
-            post_fetch_method=postfetch
-        ))
-        @datadep_str ID
+        try
+            register(DataDep(ID,
+                "Geographic data for country $country provided by the https://gadm.org project.",
+                "$route/$filename",
+                Any,
+                post_fetch_method=postfetch
+            ))
+            @datadep_str ID
+        catch e
+            if e isa HTTP.StatusError && e.status == 404
+                throw(ArgumentError("country code \"$country\" not found, please provide a standard ISO 3 country code"))
+            end
+            rethrow()
+        end
     end
 end
 

@@ -63,16 +63,20 @@ end
     # valid country code
     country = GADM.get("IND")
     @test Tables.istable(country)
-    @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
+    @test Tables.rowaccess(country)
+    row = Tables.rows(country) |> first
+    @test GeoInterface.geomtrait(Tables.getcolumn(row, :geom)) isa MultiPolygonTrait
 
     # get country and states
     country, states = GADM.get("IND", depth=0), GADM.get("IND", depth=1)
     @test Tables.istable(country)
     @test Tables.istable(states)
-    @test GeoInterface.geomtrait(country.geom[1]) isa MultiPolygonTrait
-    @test length(states) == 12 # number of fields in table
-    geometries = Tables.getcolumn(states, Symbol("geom"))
-    @test length(geometries) == 41 # number of rows
+    row = Tables.rows(country) |> first
+    @test GeoInterface.geomtrait(Tables.getcolumn(row, :geom)) isa MultiPolygonTrait
+    rows = Tables.rows(states)
+    row = rows |> first
+    @test length(rows) == 41 # number of rows
+    @test length(Tables.columnnames(row)) == 12 # number of fields in table
 
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio de Janeiro")
@@ -85,30 +89,31 @@ end
     level1 = GADM.get("IND", depth=1)
     level2 = GADM.get("IND", depth=2)
     level3 = GADM.get("IND", depth=3)
-    @test length(Tables.getcolumn(level0, :geom)) == 6
-    @test length(Tables.getcolumn(level1, :geom)) == 41
-    @test length(Tables.getcolumn(level2, :geom)) == 676
-    @test length(Tables.getcolumn(level3, :geom)) == 2347
+    @test length(Tables.rows(level0)) == 6
+    @test length(Tables.rows(level1)) == 41
+    @test length(Tables.rows(level2)) == 676
+    @test length(Tables.rows(level3)) == 2347
     
     somecities = ["Mumbai City", "Bangalore", "Chennai"]
-    @test issubset(somecities, level2.NAME_2)
+    level2cols = Tables.columns(level2)
+    @test issubset(somecities, Tables.getcolumn(level2cols, :NAME_2))
 
     # throws argument error when the level is deeper than available in dataset
     @test_throws ArgumentError GADM.get("IND", depth=4)
 
     # subregions tests
-    subregions = GADM.get("SUR", "Para", depth=1)
+    subregions = GADM.get("SUR", "Para", depth=1) |> Tables.columns
     expected = ["Bigi Poika", "Carolina", "Noord", "Oost", "Zuid"]
-    @test issetequal(subregions.NAME_2, expected)
+    @test issetequal(Tables.getcolumn(subregions, :NAME_2), expected)
 
     # subregions with same name
-    suriname = GADM.get("SUR", depth=2)
-    @test count(==("Welgelegen"), suriname.NAME_2) == 2
+    suriname = GADM.get("SUR", depth=2) |> Tables.columns
+    @test count(==("Welgelegen"), Tables.getcolumn(suriname, :NAME_2)) == 2
 
-    coronie = GADM.get("SUR", "Coronie", "Welgelegen")
-    paramaribo = GADM.get("SUR", "Paramaribo", "Welgelegen")
-    @test length(coronie.NAME_1) == length(paramaribo.NAME_1) == 1
-    @test coronie.NAME_1 ≠ paramaribo.NAME_1
+    coronie = GADM.get("SUR", "Coronie", "Welgelegen") |> Tables.columns
+    paramaribo = GADM.get("SUR", "Paramaribo", "Welgelegen") |> Tables.columns
+    @test length(Tables.getcolumn(coronie, :NAME_1)) == length(Tables.getcolumn(paramaribo, :NAME_1)) == 1
+    @test Tables.getcolumn(coronie, :NAME_1) ≠ Tables.getcolumn(paramaribo, :NAME_1)
 
     # invalid subregion
     @test_throws ArgumentError GADM.get("SUR", "a", "Welgelegen")
@@ -116,7 +121,8 @@ end
 
 @testset "basic" begin
     polygon = GADM.get("VAT")
-    bounds = ArchGDAL.envelope(polygon.geom[1])
+    row = Tables.rows(polygon) |> first
+    bounds = ArchGDAL.envelope(Tables.getcolumn(row, :geom))
     bounds_arr = [bounds.MinX, bounds.MaxX, bounds.MinY, bounds.MaxY]
 
     # Vatican City bounding boxes lat min 41.9002044 lat max 41.9073912 lon min 12.4457442 lon max 12.4583653
