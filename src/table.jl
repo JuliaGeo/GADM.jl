@@ -2,8 +2,8 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-struct Table{T,C}
-  rows::T
+struct Table{R,C}
+  rows::R
   crs::C
 end
 
