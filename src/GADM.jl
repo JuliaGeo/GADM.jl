@@ -83,7 +83,7 @@ function download(country; version="4.1")
             if e isa HTTP.StatusError && e.status == 404
                 throw(ArgumentError("country code \"$country\" not found, please provide a standard ISO 3 country code"))
             else
-                rethrow()
+                throw(ErrorException("download failed due to internet and/or server issues"))
             end
         end
     end
