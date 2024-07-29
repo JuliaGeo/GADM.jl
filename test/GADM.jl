@@ -16,8 +16,10 @@ end
     @test_nowarn @datadep_str "GADM_SUR"
     @test_nowarn @datadep_str "GADM_IND"
 
-    # invalid API version
+    # error: invalid API version
     @test_throws ArgumentError GADM.download("VAT", version="4.2")
+    # error: country code "GER" not found
+    @test_throws ArgumentError GADM.download("GER")
 end
 
 @testset "dataread" begin
