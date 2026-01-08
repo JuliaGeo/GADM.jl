@@ -1,10 +1,10 @@
 <p align="center">
   <img src="docs/banner.png"><br>
   <a href="https://github.com/JuliaGeo/GADM.jl/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/JuliaGeo/GADM.jl/CI.yml?branch=master">
+    <img src="https://img.shields.io/github/actions/workflow/status/JuliaGeo/GADM.jl/CI.yml?branch=main">
   </a>
   <a href="https://codecov.io/gh/JuliaGeo/GADM.jl">
-    <img src="https://codecov.io/gh/JuliaGeo/GADM.jl/branch/master/graph/badge.svg">
+    <img src="https://codecov.io/gh/JuliaGeo/GADM.jl/branch/main/graph/badge.svg">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green.svg">
