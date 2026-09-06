@@ -74,7 +74,10 @@ end
     rows = Tables.rows(states)
     row = rows |> first
     @test length(rows) == 41 # number of rows
-    @test length(Tables.columnnames(row)) == 12 # number of fields in table
+    # ArchGDAL 0.10.12 exposes the GeoPackage FID column and requires Julia 1.10.
+    # Guard pkgversion for the Julia 1.6 test environment.
+    ncolumns = VERSION >= v"1.9" && pkgversion(ArchGDAL) >= v"0.10.12" ? 13 : 12
+    @test length(Tables.columnnames(row)) == ncolumns
 
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio de Janeiro")
