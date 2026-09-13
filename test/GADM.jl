@@ -74,7 +74,7 @@ end
     rows = Tables.rows(states)
     row = rows |> first
     @test length(rows) == 41 # number of rows
-    @test length(Tables.columnnames(row)) == 12 # number of fields in table
+    @test length(Tables.columnnames(row)) == 13
 
     # throws error when query is invalid
     @test_throws ArgumentError GADM.get("IND", "Rio de Janeiro")
