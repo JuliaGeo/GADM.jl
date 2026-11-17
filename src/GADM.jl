@@ -8,6 +8,7 @@ using DataDeps
 using ArchGDAL
 using Tables
 using HTTP
+import Downloads
 
 import GeoInterface as GI
 
@@ -80,7 +81,7 @@ function download(country; version="4.1")
             ))
             @datadep_str ID
         catch e
-            if e isa HTTP.StatusError && e.status == 404
+            if is_not_found(e)
                 throw(ArgumentError("country code \"$country\" not found, please provide a standard ISO 3 country code"))
             else
                 throw(ErrorException("download failed due to internet and/or server issues"))
@@ -88,6 +89,11 @@ function download(country; version="4.1")
         end
     end
 end
+
+# A missing file is a 404: an `HTTP.StatusError` with DataDeps 0.7, which downloads
+# through HTTP.jl, and a `Downloads.RequestError` with DataDeps 1, which uses Downloads.
+is_not_found(e) = (e isa HTTP.StatusError && e.status == 404) ||
+                  (e isa Downloads.RequestError && e.response.status == 404)
 
 """
     dataread(path)
